@@ -4,33 +4,11 @@ import React, { useState, useRef } from "react";
 import Fretboard from "../fretboard/fretboard";
 import Footer from "../../components/footer";
 import { useTranslations } from "next-intl";
+import { Mic, MicOff, Music, Sparkles, CheckCircle2, RotateCcw, Play, Square } from "lucide-react";
 
 interface MidiData {
   data?: Record<string, [number, number] | any> | null;
 }
-
-interface PlayIconProps extends React.SVGProps<SVGSVGElement> {
-  isRecording: boolean;
-}
-
-const PlayIcon: React.FC<PlayIconProps> = ({ isRecording, ...props }) => {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points={isRecording ? "3 3 3 20 22 20 22 3" : "6 3 20 12 6 21 6 3"} />
-    </svg>
-  );
-};
 
 export default function Record() {
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -38,10 +16,11 @@ export default function Record() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [isShowTabs, setIsShowTabs] = useState<boolean>(false);
-  const [tabs, setTabs] = useState<MidiData|any>(null);
+  const [tabs, setTabs] = useState<MidiData | any>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
-  const t = useTranslations("record")
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const t = useTranslations("record");
 
   const handleButtonClick = () => {
     if (isRecording) {
@@ -60,26 +39,30 @@ export default function Record() {
   };
 
   const startRecording = () => {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
+    setErrorMsg(null);
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
         mediaRecorderRef.current = new MediaRecorder(stream);
 
-        mediaRecorderRef.current.ondataavailable = event => {
+        mediaRecorderRef.current.ondataavailable = (event) => {
           audioChunksRef.current.push(event.data);
         };
 
         mediaRecorderRef.current.onstop = () => {
           const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/mp3' });
           audioChunksRef.current = [];
-          const audioURL = window.URL.createObjectURL(audioBlob);
-          setAudioURL(audioURL);
+          const url = window.URL.createObjectURL(audioBlob);
+          setAudioURL(url);
           setBlob(audioBlob);
         };
 
         mediaRecorderRef.current.start();
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error accessing microphone:', err);
+        setErrorMsg('Пожалуйста, разрешите доступ к микрофону для записи.');
+        setIsRecording(false);
       });
   };
 
@@ -98,65 +81,136 @@ export default function Record() {
         method: 'POST',
         body: formData,
       });
-      
+
       if (response.ok) {
-        console.log('Audio file uploaded successfully');
         const data = await response.json();
-        console.log(data);
         setTabs(data.midi_data);
         setUploading(false);
         setIsShowTabs(true);
       } else {
-        console.error('Failed to upload audio file');
+        setErrorMsg('Сервер временно недоступен. Попробуйте еще раз позже.');
+        setUploading(false);
       }
     } catch (error) {
       console.error('Error uploading audio file:', error);
+      setErrorMsg('Ошибка отправки файла на сервер.');
+      setUploading(false);
     }
   };
 
   return (
-    <div>
+    <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] flex flex-col">
       {!isShowTabs && (
-        <div className="flex flex-col items-center justify-between min-h-screen py-0 bg-gray-220">
-          <main className="flex flex-col items-center justify-center flex-grow">
-            <h1 className="text-4xl font-bold text-center py-8">
-              {t('head')}
-            </h1>
-            <button
-              disabled={uploading}
-              onClick={handleButtonClick}
-              className="relative flex items-center justify-center w-64 h-64 border-4 border-gray-900 rounded-full hover:scale-110 transition-transform duration-300"
-            >
-              <div className="absolute flex items-center justify-center w-48 h-48 border-4 border-gray-800 rounded-full animate-pulse">
-                <PlayIcon isRecording={isRecording} className="w-16 h-16 text-red-600" />
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+          <div className="w-full max-w-md flex flex-col items-center gap-6">
+            {/* Title Header */}
+            <div className="text-center">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
+                <Sparkles size={13} />
+                <span>ИИ Транскрибация</span>
               </div>
-            </button>
-            {isRecording && <p className="mt-4 text-red-500 animate-bounce">{t('rec')}</p>}
-            
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                {t('head')}
+              </h1>
+              <p className="text-xs text-stone-400 mt-1 max-w-xs mx-auto">
+                Запишите сыгранный на домбре фрагмент, и нейросеть определит лады и струны
+              </p>
+            </div>
+
+            {/* Glowing Record Button */}
+            <div className="relative flex items-center justify-center my-4">
+              {/* Outer Pulse Glow */}
+              <div
+                className={`absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full transition-all duration-500 ${
+                  isRecording
+                    ? 'bg-rose-600/30 animate-ping'
+                    : 'bg-amber-500/10'
+                }`}
+              />
+
+              <button
+                disabled={uploading}
+                onClick={handleButtonClick}
+                className={`relative w-44 h-44 sm:w-52 sm:h-52 rounded-full border-4 flex flex-col items-center justify-center transition-all duration-300 shadow-2xl active:scale-95 ${
+                  isRecording
+                    ? 'bg-gradient-to-tr from-rose-700 via-rose-600 to-rose-700 border-rose-400 shadow-rose-600/50'
+                    : 'bg-gradient-to-tr from-[#2E1D13] via-[#3D271A] to-[#25170E] hover:from-[#3D271A] hover:to-[#4A3020] border-amber-500/60 shadow-amber-950/60 hover:scale-105'
+                }`}
+              >
+                {isRecording ? (
+                  <>
+                    <Square size={44} className="text-white fill-white" />
+                    <span className="text-xs font-bold text-white mt-2 uppercase tracking-wider">
+                      Остановить
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Mic size={48} className="text-amber-400" />
+                    <span className="text-xs font-bold text-amber-300 mt-2 uppercase tracking-wider">
+                      Начать запись
+                    </span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {isRecording && (
+              <p className="text-xs font-bold text-rose-400 flex items-center gap-2 animate-pulse">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                <span>{t('rec')}</span>
+              </p>
+            )}
+
+            {errorMsg && (
+              <p className="text-xs text-rose-400 text-center max-w-xs">{errorMsg}</p>
+            )}
+
+            {/* Audio Preview & Process Card */}
             {audioURL && (
-              <div className="flex flex-col items-center justify-between">
-                <audio src={audioURL} controls className="mt-4 rounded-md bg-gray-220" />
-                <button 
-                  type="button" 
-                  className="m-5 text-white bg-black hover:bg-gray-800 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center me-2 mb-2"
+              <div className="w-full p-4 rounded-2xl bg-[#1E1410] border border-[#3d291e] shadow-xl flex flex-col items-center gap-3">
+                <span className="text-xs font-bold text-stone-300">Прослушать запись:</span>
+                <audio src={audioURL} controls className="w-full h-10 rounded-lg" />
+
+                <button
+                  type="button"
+                  disabled={uploading}
                   onClick={showTabs}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-600/20 transition-all disabled:opacity-50"
                 >
-                  {uploading && (
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                  {uploading ? (
+                    <>
+                      <Sparkles size={16} className="animate-spin" />
+                      <span>{t('wait')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Music size={16} />
+                      <span>{t('note')}</span>
+                    </>
                   )}
-                  {uploading ? <div>{t('wait')}...</div> : <div>{t('note')}</div>}
                 </button>
               </div>
             )}
-          </main>
+          </div>
         </div>
       )}
 
-      {isShowTabs && <Fretboard data={tabs} />}
-      
+      {isShowTabs && (
+        <div className="flex-1 w-full p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-white">Распознанные ноты</h2>
+            <button
+              onClick={() => setIsShowTabs(false)}
+              className="px-3 py-1.5 rounded-xl bg-[#281B14] border border-[#442C20] text-xs font-bold text-stone-300 hover:text-white"
+            >
+              Записать ещё
+            </button>
+          </div>
+          <Fretboard data={tabs} />
+        </div>
+      )}
+
       <Footer />
     </div>
   );

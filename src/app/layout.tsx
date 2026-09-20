@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "../components/bottom-nav";
 import LanguageSwitcher from "../components/language";
+import NuraliMascot from "../components/nurali/NuraliMascot";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { Analytics } from "@vercel/analytics/react";
@@ -78,6 +79,9 @@ export default async function RootLayout({
             <main className="flex-1 w-full">
               {children}
             </main>
+
+            {/* Interactive Nurali Mascot & AI Chat */}
+            <NuraliMascot />
 
             {/* Bottom Navigation for Mobile */}
             <BottomNav />
