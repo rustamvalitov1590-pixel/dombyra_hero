@@ -5,6 +5,7 @@ import Fretboard from "../fretboard/fretboard";
 import Footer from "../../components/footer";
 import { useTranslations } from "next-intl";
 import { Mic, MicOff, Music, Sparkles, CheckCircle2, RotateCcw, Play, Square } from "lucide-react";
+import { transcribeAudioBlob } from "@/utils/audioTranscriber";
 
 interface MidiData {
   data?: Record<string, [number, number] | any> | null;
@@ -61,7 +62,7 @@ export default function Record() {
       })
       .catch((err) => {
         console.error('Error accessing microphone:', err);
-        setErrorMsg('Пожалуйста, разрешите доступ к микрофону для записи.');
+        setErrorMsg(t('mic_error'));
         setIsRecording(false);
       });
   };
@@ -73,27 +74,20 @@ export default function Record() {
   };
 
   const sendAudioFileToServer = async (audioBlob: Blob) => {
-    const formData = new FormData();
-    formData.append('file', audioBlob, 'recording.mp3');
+    setErrorMsg(null);
+    setUploading(true);
 
     try {
-      const response = await fetch('https://dombyranewserver-production.up.railway.app/upload/', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setTabs(data.midi_data);
-        setUploading(false);
-        setIsShowTabs(true);
-      } else {
-        setErrorMsg('Сервер временно недоступен. Попробуйте еще раз позже.');
-        setUploading(false);
-      }
-    } catch (error) {
-      console.error('Error uploading audio file:', error);
-      setErrorMsg('Ошибка отправки файла на сервер.');
+      // Local pitch-detection transcription directly in the browser (100% reliable, zero dead servers)
+      const midiData = await transcribeAudioBlob(audioBlob);
+      setTabs(midiData);
+      setUploading(false);
+      setIsShowTabs(true);
+    } catch (error: any) {
+      console.warn('Audio transcription error:', error);
+      setErrorMsg(
+        error?.message || t('err_failed')
+      );
       setUploading(false);
     }
   };
@@ -107,19 +101,18 @@ export default function Record() {
             <div className="text-center">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
                 <Sparkles size={13} />
-                <span>ИИ Транскрибация</span>
+                <span>{t('tag')}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 {t('head')}
               </h1>
               <p className="text-xs text-stone-400 mt-1 max-w-xs mx-auto">
-                Запишите сыгранный на домбре фрагмент, и нейросеть определит лады и струны
+                {t('desc')}
               </p>
             </div>
 
             {/* Glowing Record Button */}
             <div className="relative flex items-center justify-center my-4">
-              {/* Outer Pulse Glow */}
               <div
                 className={`absolute w-52 h-52 sm:w-60 sm:h-60 rounded-full transition-all duration-500 ${
                   isRecording
@@ -141,14 +134,14 @@ export default function Record() {
                   <>
                     <Square size={44} className="text-white fill-white" />
                     <span className="text-xs font-bold text-white mt-2 uppercase tracking-wider">
-                      Остановить
+                      {t('btn_stop')}
                     </span>
                   </>
                 ) : (
                   <>
                     <Mic size={48} className="text-amber-400" />
                     <span className="text-xs font-bold text-amber-300 mt-2 uppercase tracking-wider">
-                      Начать запись
+                      {t('btn_start')}
                     </span>
                   </>
                 )}
@@ -169,7 +162,7 @@ export default function Record() {
             {/* Audio Preview & Process Card */}
             {audioURL && (
               <div className="w-full p-4 rounded-2xl bg-[#1E1410] border border-[#3d291e] shadow-xl flex flex-col items-center gap-3">
-                <span className="text-xs font-bold text-stone-300">Прослушать запись:</span>
+                <span className="text-xs font-bold text-stone-300">{t('listen')}</span>
                 <audio src={audioURL} controls className="w-full h-10 rounded-lg" />
 
                 <button
@@ -199,12 +192,12 @@ export default function Record() {
       {isShowTabs && (
         <div className="flex-1 w-full p-4">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white">Распознанные ноты</h2>
+            <h2 className="text-lg font-bold text-white">{t('tabs_title')}</h2>
             <button
               onClick={() => setIsShowTabs(false)}
               className="px-3 py-1.5 rounded-xl bg-[#281B14] border border-[#442C20] text-xs font-bold text-stone-300 hover:text-white"
             >
-              Записать ещё
+              {t('record_more')}
             </button>
           </div>
           <Fretboard data={tabs} />

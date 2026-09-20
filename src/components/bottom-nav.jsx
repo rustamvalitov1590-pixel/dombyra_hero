@@ -44,7 +44,7 @@ const BottomNav = () => {
           href="/record"
           className="flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-amber-500 to-amber-600 rounded-full shadow-lg shadow-amber-500/40 text-stone-950 transform hover:scale-110 active:scale-95 transition-all ring-2 ring-amber-300"
           prefetch={false}
-          title="Запись ИИ"
+          title={t('record_ai')}
         >
           <Mic size={22} className="stroke-[2.5]" />
         </Link>

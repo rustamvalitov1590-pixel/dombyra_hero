@@ -1,8 +1,13 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import { Sparkles, Music, BookOpen, SlidersHorizontal, Trophy } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Sparkles, BookOpen, SlidersHorizontal, Trophy } from "lucide-react";
 
 export default function Footer() {
+  const t = useTranslations('footer');
+
   return (
     <footer className="w-full mt-auto bg-[#140b07] border-t border-[#3b271d] py-8 px-4 md:px-8 text-[#E8DBCF]/80">
       <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
@@ -21,7 +26,7 @@ export default function Footer() {
             </span>
           </Link>
           <p className="text-xs text-stone-400 max-w-sm">
-            Интерактивная платформа изучения домбры: синхронный гриф, точный тюнер, караоке и ИИ-наставник Нурали.
+            {t('desc')}
           </p>
         </div>
 
@@ -31,36 +36,36 @@ export default function Footer() {
             className="text-stone-300 hover:text-amber-300 transition-colors flex items-center gap-1"
           >
             <BookOpen size={13} />
-            <span>Тренажёр</span>
+            <span>{t('learn')}</span>
           </Link>
           <Link
             href="/tuner"
             className="text-stone-300 hover:text-emerald-300 transition-colors flex items-center gap-1"
           >
             <SlidersHorizontal size={13} />
-            <span>Тюнер</span>
+            <span>{t('tuner')}</span>
           </Link>
           <Link
             href="/karaoke"
             className="text-stone-300 hover:text-rose-300 transition-colors flex items-center gap-1"
           >
             <Trophy size={13} />
-            <span>Караоке</span>
+            <span>{t('karaoke')}</span>
           </Link>
           <Link
             href="/about"
             className="text-stone-300 hover:text-amber-300 transition-colors"
           >
-            О проекте
+            {t('about')}
           </Link>
         </nav>
       </div>
 
       <div className="max-w-4xl mx-auto mt-6 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-stone-500 text-center sm:text-left">
-        <p>&copy; {new Date().getFullYear()} DombraHero. Қазақстанның музыкалық мұрасы.</p>
+        <p>&copy; {new Date().getFullYear()} DombraHero. {t('heritage')}</p>
         <p className="flex items-center gap-1 text-amber-500/80">
           <Sparkles size={12} />
-          <span>Сделано с любовью к казахской домбре</span>
+          <span>{t('love')}</span>
         </p>
       </div>
     </footer>

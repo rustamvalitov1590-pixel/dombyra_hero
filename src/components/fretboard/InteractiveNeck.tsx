@@ -3,6 +3,7 @@
 import React from 'react';
 import { getFretNoteName } from '@/data/songs';
 import dombyraAudio from '@/utils/dombyraAudio';
+import { useTranslations } from 'next-intl';
 
 interface InteractiveNeckProps {
   activeBottomFret: number | null;
@@ -21,6 +22,7 @@ export const InteractiveNeck: React.FC<InteractiveNeckProps> = ({
   className = '',
   theme = 'dark',
 }) => {
+  const t = useTranslations('fretboard');
   const totalFrets = 19;
   const fretMarkers = [2, 5, 7, 10, 12, 14, 17];
   const isDark = theme === 'dark';
@@ -44,25 +46,25 @@ export const InteractiveNeck: React.FC<InteractiveNeckProps> = ({
     >
       <div className="flex items-center justify-between mb-2 px-1">
         <div className="text-xs font-bold uppercase tracking-wider opacity-70">
-          Гриф домбры (20 ладов)
+          {t('title')}
         </div>
         <div className="text-[11px] opacity-50">
-          Нажмите на любой лад для проверки звука
+          {t('subtitle')}
         </div>
       </div>
 
       {/* Dombyra Fretboard Horizontal Container */}
       <div className="relative w-full overflow-x-auto pb-2 scrollbar-hide">
         <div className="relative min-w-[760px] h-[130px] flex flex-col justify-center px-4 rounded-xl bg-gradient-to-b from-[#2a1b13] via-[#332218] to-[#241710] border border-[#4d3324] shadow-inner">
-          {/* Top String (В / D3) line */}
+          {/* Top String line */}
           <div className="absolute top-[38px] left-8 right-4 h-[2px] bg-gradient-to-r from-amber-100 via-amber-200 to-amber-100 shadow-[0_0_4px_rgba(255,255,255,0.7)] pointer-events-none" />
 
-          {/* Bottom String (Н / G3) line - thicker nylon/gut string */}
+          {/* Bottom String line - thicker nylon/gut string */}
           <div className="absolute top-[82px] left-8 right-4 h-[3.5px] bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 shadow-[0_0_6px_rgba(245,158,11,0.5)] pointer-events-none" />
 
-          {/* Headstock / Nut (Шайтан тиек) */}
+          {/* Headstock / Nut */}
           <div className="absolute left-6 top-2 bottom-2 w-3 rounded-sm bg-gradient-to-r from-[#140b07] to-[#3a2014] border-r border-[#693f24] shadow-md flex items-center justify-center">
-            <span className="text-[8px] font-bold text-amber-500 -rotate-90">ТИЕК</span>
+            <span className="text-[8px] font-bold text-amber-500 -rotate-90">{t('nut')}</span>
           </div>
 
           {/* Frets Grid */}
@@ -129,7 +131,7 @@ export const InteractiveNeck: React.FC<InteractiveNeckProps> = ({
                   {/* Top String Fret Button */}
                   <button
                     onClick={() => handlePlayFret('top', fret)}
-                    title={`Верхняя струна, лад ${fret}: ${topNote.fullName}`}
+                    title={`${t('top_tooltip')} ${fret}: ${topNote.fullName}`}
                     className={`w-6 h-6 mx-auto rounded-full flex items-center justify-center text-[9px] font-black transition-all ${
                       isTopActive
                         ? 'bg-gradient-to-tr from-[#C49138] to-[#E6C894] text-[#1A0F07] ring-2 ring-[#FFF8E7] shadow-md shadow-amber-950/50 scale-125 z-20'
@@ -142,7 +144,7 @@ export const InteractiveNeck: React.FC<InteractiveNeckProps> = ({
                   {/* Bottom String Fret Button */}
                   <button
                     onClick={() => handlePlayFret('bottom', fret)}
-                    title={`Нижняя струна, лад ${fret}: ${bottomNote.fullName}`}
+                    title={`${t('bottom_tooltip')} ${fret}: ${bottomNote.fullName}`}
                     className={`w-6 h-6 mx-auto rounded-full flex items-center justify-center text-[9px] font-black transition-all ${
                       isBottomActive
                         ? 'bg-gradient-to-tr from-[#A66236] to-[#D4A373] text-[#1A0F07] ring-2 ring-[#FFF8E7] shadow-md shadow-amber-950/50 scale-125 z-20'

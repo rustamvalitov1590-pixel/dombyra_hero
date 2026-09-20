@@ -6,6 +6,7 @@ import Tablature from '@/components/tablature/Tablature';
 import dombyraAudio from '@/utils/dombyraAudio';
 import { Mic, MicOff, Trophy, Flame, Play, RotateCcw, Award, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 type StepEvaluation = 'perfect' | 'good' | 'miss' | 'pending';
 
@@ -59,6 +60,7 @@ function autoCorrelate(buf: Float32Array, sampleRate: number): number {
 }
 
 export default function KaraokePage() {
+  const t = useTranslations('karaoke');
   const [selectedSongIndex, setSelectedSongIndex] = useState<number>(6); // Default to 'Еркем-ай' (as in screenshot)
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
@@ -108,7 +110,7 @@ export default function KaraokePage() {
       setIsMicReady(true);
     } catch (e) {
       console.warn('Microphone error:', e);
-      alert('Пожалуйста, разрешите доступ к микрофону для караоке.');
+      alert(t('mic_permission_alert'));
     }
   };
 
@@ -272,13 +274,13 @@ export default function KaraokePage() {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
-                Караоке на домбре
+                {t('title')}
                 <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                  Live Микрофон
+                  {t('live_mic')}
                 </span>
               </h1>
               <p className="text-xs text-[#E8DBCF]/70">
-                Играйте на реальной домбре — микрофон слушает и проверяет точность нот
+                {t('subtitle')}
               </p>
             </div>
           </div>
@@ -288,13 +290,13 @@ export default function KaraokePage() {
               href="/tuner"
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors"
             >
-              Тюнер
+              {t('btn_tuner')}
             </Link>
             <Link
               href="/learn"
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors"
             >
-              Тренажёр
+              {t('btn_trainer')}
             </Link>
           </div>
         </div>
@@ -307,7 +309,7 @@ export default function KaraokePage() {
               ★
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-stone-400">Счёт</div>
+              <div className="text-[10px] uppercase font-bold text-stone-400">{t('score')}</div>
               <div className="text-2xl font-black text-amber-300">{score}</div>
             </div>
           </div>
@@ -318,7 +320,7 @@ export default function KaraokePage() {
               %
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-stone-400">Точность</div>
+              <div className="text-[10px] uppercase font-bold text-stone-400">{t('accuracy')}</div>
               <div className="text-2xl font-black text-emerald-300">{accuracy}%</div>
             </div>
           </div>
@@ -329,7 +331,7 @@ export default function KaraokePage() {
               <Flame size={20} />
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-stone-400">Комбо</div>
+              <div className="text-[10px] uppercase font-bold text-stone-400">{t('combo')}</div>
               <div className="text-2xl font-black text-rose-300">{combo}×</div>
             </div>
           </div>
@@ -342,14 +344,14 @@ export default function KaraokePage() {
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-900/40 ring-2 ring-emerald-400"
               >
                 <Play size={16} />
-                <span>Начать караоке</span>
+                <span>{t('btn_start')}</span>
               </button>
             ) : (
               <button
                 onClick={handleStopGame}
                 className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-rose-900/40"
               >
-                <span>Остановить</span>
+                <span>{t('btn_stop')}</span>
               </button>
             )}
           </div>
@@ -368,10 +370,10 @@ export default function KaraokePage() {
               }`}
             >
               {latestFeedback === 'PERFECT'
-                ? '🟢 Точно!'
+                ? t('hit_perfect')
                 : latestFeedback === 'GOOD'
-                ? '🟡 Близко!'
-                : '🔴 Промах'}
+                ? t('hit_good')
+                : t('hit_miss')}
             </span>
           </div>
         )}
@@ -403,11 +405,11 @@ export default function KaraokePage() {
         <div className="w-full flex flex-col gap-2">
           <div className="flex items-center justify-between px-1 text-xs text-stone-400">
             <span>
-              Кюй:{' '}
+              {t('kui')}{' '}
               <strong className="text-amber-300">{song.title}</strong> ({song.author})
             </span>
             <span>
-              {song.tuning_key === 'teris' ? 'Теріс бұрау (G3/C3)' : 'Оң бұрау (G3/D3)'}
+              {song.tuning_key === 'teris' ? t('tuning_teris') : t('tuning_standard')}
             </span>
           </div>
 
@@ -426,23 +428,23 @@ export default function KaraokePage() {
             <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-300">
               <Award size={36} />
             </div>
-            <h3 className="text-2xl font-black text-white">Вы завершили кюй!</h3>
+            <h3 className="text-2xl font-black text-white">{t('finished_title')}</h3>
             <p className="text-xs text-stone-300 text-center max-w-sm">
-              Отличная игра! Микрофон записал ваши ноты. Ниже итоговый результат выступления:
+              {t('finished_desc')}
             </p>
 
             <div className="grid grid-cols-3 gap-4 w-full max-w-md my-2">
               <div className="p-3 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 flex flex-col items-center">
                 <span className="text-xl font-black text-emerald-300">{results.perfect}</span>
-                <span className="text-[10px] text-emerald-400/80 font-bold uppercase">Точно</span>
+                <span className="text-[10px] text-emerald-400/80 font-bold uppercase">{t('stat_perfect')}</span>
               </div>
               <div className="p-3 rounded-2xl bg-amber-950/60 border border-amber-500/30 flex flex-col items-center">
                 <span className="text-xl font-black text-amber-300">{results.good}</span>
-                <span className="text-[10px] text-amber-400/80 font-bold uppercase">Близко</span>
+                <span className="text-[10px] text-amber-400/80 font-bold uppercase">{t('stat_good')}</span>
               </div>
               <div className="p-3 rounded-2xl bg-rose-950/60 border border-rose-500/30 flex flex-col items-center">
                 <span className="text-xl font-black text-rose-300">{results.miss}</span>
-                <span className="text-[10px] text-rose-400/80 font-bold uppercase">Промахи</span>
+                <span className="text-[10px] text-rose-400/80 font-bold uppercase">{t('stat_miss')}</span>
               </div>
             </div>
 
@@ -452,13 +454,13 @@ export default function KaraokePage() {
                 className="px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg"
               >
                 <RotateCcw size={16} />
-                <span>Сыграть ещё раз</span>
+                <span>{t('btn_retry')}</span>
               </button>
               <Link
                 href="/learn"
                 className="px-6 py-2.5 rounded-xl bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 font-bold text-xs flex items-center gap-2"
               >
-                <span>Отработать в тренажёре</span>
+                <span>{t('btn_practice')}</span>
               </Link>
             </div>
           </div>

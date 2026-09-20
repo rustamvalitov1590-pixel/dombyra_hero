@@ -38,8 +38,8 @@ export interface Song {
 // Clean and normalize songs
 export const SONGS: Song[] = (rawSongsData as any[]).map((raw) => ({
   id: raw.id,
-  title: raw.title?.trim() || 'Без названия',
-  author: raw.author?.trim() || 'Халық күйі',
+  title: raw.title?.trim() || '',
+  author: raw.author?.trim() || '',
   slug: raw.slug,
   sort_order: raw.sort_order ?? 0,
   tuning_key: raw.tuning_key || 'standard',
@@ -47,7 +47,7 @@ export const SONGS: Song[] = (rawSongsData as any[]).map((raw) => ({
   title_i18n: raw.title_i18n || {},
   author_i18n: raw.author_i18n || {},
   sections: (raw.sections || []).map((sec: any, idx: number) => ({
-    name: sec.name?.startsWith('ЧАСТЬ') ? sec.name : `ЧАСТЬ ${sec.name || idx + 1}`,
+    name: sec.name ? String(sec.name).replace(/^(ЧАСТЬ|БӨЛІМ)\s*/i, '').trim() : String(idx + 1),
     repeatCount: sec.repeatCount ?? sec.repeat ?? 1,
     steps: sec.steps || [],
   })),

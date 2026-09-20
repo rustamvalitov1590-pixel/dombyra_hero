@@ -32,10 +32,10 @@ const Fretboard: React.FC<FretboardProps> = ({data}) => {
   useEffect(() => {
     const userAgent = typeof window.navigator === "undefined" ? "" : navigator.userAgent;
     const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
-    if(isMobile){
-      alert("Ұялы телефонды бұрыңыз")
+    if (isMobile) {
+      alert(t("rotate_phone"));
     }
-  }, []);
+  }, [t]);
 
 
   useEffect(() => {
@@ -216,9 +216,9 @@ const Fretboard: React.FC<FretboardProps> = ({data}) => {
           onChange={e => setOctave(Number(e.target.value))}
           className="bg-white border border-gray-300 rounded px-2 py-1"
         >
-          <option value={12}>Октава+1</option>
-          <option value={0}>Октава</option>
-          <option value={-12}>Октава-1</option>
+          <option value={12}>{t("octave_plus")}</option>
+          <option value={0}>{t("octave_standard")}</option>
+          <option value={-12}>{t("octave_minus")}</option>
         </select>
         <select
           id="instrument"
@@ -226,8 +226,8 @@ const Fretboard: React.FC<FretboardProps> = ({data}) => {
           onChange={e => setInstrument(e.target.value)}
           className="bg-white border border-gray-300 rounded px-2 py-1"
         >
-          <option value='synth'>Синтезатор</option>
-          <option value="dombyra">Домбыра</option>
+          <option value='synth'>{t("synth")}</option>
+          <option value="dombyra">{t("dombyra")}</option>
         </select>
       </div>
       <div className={styles.fretboard}></div>

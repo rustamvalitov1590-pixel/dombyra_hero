@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { Song, SongSection, SongStep } from '@/data/songs';
+import { useTranslations } from 'next-intl';
 
 interface TablatureProps {
   song: Song;
@@ -22,6 +23,7 @@ export const Tablature: React.FC<TablatureProps> = ({
   className = '',
   theme = 'dark',
 }) => {
+  const t = useTranslations('tablature');
   const activeCardRef = useRef<HTMLDivElement | null>(null);
 
   // Auto-scroll active card into view when playing
@@ -45,19 +47,16 @@ export const Tablature: React.FC<TablatureProps> = ({
           : 'bg-white text-slate-800 border border-slate-200'
       } rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-md ${className}`}
     >
-      {/* Legend header - matching user screenshot */}
+      {/* Legend header */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs sm:text-sm font-medium opacity-75 border-b pb-3 mb-5 border-current/10">
         <div className="flex items-center gap-1.5">
-          <span className="font-bold">Н</span>
-          <span>— нижняя струна (G3, 196 Гц)</span>
+          <span>{t('bottom_string')}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="font-bold">В</span>
-          <span>— верхняя струна ({song.tuning_key === 'teris' ? 'C3, 130.81 Гц' : 'D3, 146.83 Гц'})</span>
+          <span>{t('top_string')} ({song.tuning_key === 'teris' ? 'C3, 130.81 Гц' : 'D3, 146.83 Гц'})</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="font-bold">↓↑</span>
-          <span>— удар</span>
+          <span>{t('stroke_symbol')}</span>
         </div>
       </div>
 
@@ -71,7 +70,7 @@ export const Tablature: React.FC<TablatureProps> = ({
               {/* Section title & repeat count pill badge */}
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold tracking-wider uppercase opacity-90">
-                  {section.name}
+                  {t('part')} {section.name}
                 </span>
                 {(section.repeatCount || 1) > 1 && (
                   <span
@@ -88,10 +87,10 @@ export const Tablature: React.FC<TablatureProps> = ({
 
               {/* Tab Grid Row: Left labels column + Note columns */}
               <div className="relative flex items-center gap-2">
-                {/* Fixed row labels: H, B, ↓↑ */}
+                {/* Fixed row labels: H/T, B/Ж, ↓↑ */}
                 <div className="flex flex-col items-center justify-between h-[100px] py-1 text-sm font-bold opacity-60 w-6 shrink-0 border-r border-current/10 pr-2">
-                  <div className="h-7 flex items-center justify-center">Н</div>
-                  <div className="h-7 flex items-center justify-center">В</div>
+                  <div className="h-7 flex items-center justify-center">{t('bottom_abbr')}</div>
+                  <div className="h-7 flex items-center justify-center">{t('top_abbr')}</div>
                   <div className="h-6 flex items-center justify-center text-xs">↓↑</div>
                 </div>
 

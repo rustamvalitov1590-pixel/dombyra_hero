@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Footer from './footer';
 import { SONGS } from '@/data/songs';
+import NuraliAvatar from './nurali/NuraliAvatar';
 import {
   Music,
   BookOpen,
@@ -37,7 +38,7 @@ export default function Landing() {
             {/* Top Pill Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 mb-5 rounded-full bg-gradient-to-r from-amber-500/20 to-emerald-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold tracking-wide shadow-lg">
               <Sparkles size={14} className="text-amber-400" />
-              <span>DombraHero — Интерактивная платформа</span>
+              <span>{t('badge')}</span>
             </div>
 
             {/* Main Headline */}
@@ -73,15 +74,15 @@ export default function Landing() {
             <div className="flex flex-wrap items-center justify-center gap-4 mt-6 text-xs text-stone-400">
               <span className="flex items-center gap-1.5">
                 <ShieldCheck size={14} className="text-amber-400" />
-                20 ладов и 2 строя (Оң / Теріс)
+                {t('feature_frets')}
               </span>
               <span className="flex items-center gap-1.5">
                 <Zap size={14} className="text-emerald-400" />
-                Онлайн-анализ через микрофон
+                {t('feature_mic')}
               </span>
               <span className="flex items-center gap-1.5">
                 <Sparkles size={14} className="text-amber-400" />
-                ИИ-наставник Нурали
+                {t('feature_nurali')}
               </span>
             </div>
           </div>
@@ -94,7 +95,7 @@ export default function Landing() {
               {t('how_it_work')}
             </h2>
             <p className="text-xs sm:text-sm text-stone-400 mt-1">
-              Всё необходимое для обучения, практики и совершенствования мастерства
+              {t('pillars_desc')}
             </p>
           </div>
 
@@ -110,18 +111,18 @@ export default function Landing() {
                     <BookOpen size={24} />
                   </div>
                   <span className="text-[10px] uppercase font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
-                    Интерактив
+                    {t('pill_interactive')}
                   </span>
                 </div>
                 <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
-                  Тренажёр кюев с грифом
+                  {t('pillar_learn_title')}
                 </h3>
                 <p className="text-xs text-stone-400 mt-1.5 leading-relaxed">
-                  Пошаговый разбор кюев нота за нотой с синхронной 20-ладовой домброй, указанием направления ударов (қағыс: ↑/↓) и дуг легато.
+                  {t('pillar_learn_desc')}
                 </p>
               </div>
               <div className="mt-4 flex items-center text-xs font-bold text-amber-300 group-hover:translate-x-1 transition-transform">
-                <span>Перейти в тренажёр</span>
+                <span>{t('pillar_learn_action')}</span>
                 <ArrowRight size={14} className="ml-1" />
               </div>
             </Link>
@@ -137,18 +138,18 @@ export default function Landing() {
                     <SlidersHorizontal size={24} />
                   </div>
                   <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                    Live Микрофон
+                    {t('pill_mic')}
                   </span>
                 </div>
                 <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
-                  Точный тюнер домбры
+                  {t('pillar_tuner_title')}
                 </h3>
                 <p className="text-xs text-stone-400 mt-1.5 leading-relaxed">
-                  Определение высоты тона через микрофон в реальном времени. Поддержка Оң бұрау (G3/D3) и Теріс бұрау (G3/C3) с подсказками колков.
+                  {t('pillar_tuner_desc')}
                 </p>
               </div>
               <div className="mt-4 flex items-center text-xs font-bold text-emerald-300 group-hover:translate-x-1 transition-transform">
-                <span>Настроить инструмент</span>
+                <span>{t('pillar_tuner_action')}</span>
                 <ArrowRight size={14} className="ml-1" />
               </div>
             </Link>
@@ -164,18 +165,18 @@ export default function Landing() {
                     <Trophy size={24} />
                   </div>
                   <span className="text-[10px] uppercase font-bold text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/20">
-                    Геймификация
+                    {t('pill_gamification')}
                   </span>
                 </div>
                 <h3 className="text-base font-bold text-white group-hover:text-rose-300 transition-colors">
-                  Караоке игра на домбре
+                  {t('pillar_karaoke_title')}
                 </h3>
                 <p className="text-xs text-stone-400 mt-1.5 leading-relaxed">
-                  Играйте на реальной домбре перед микрофоном. Платформа проверяет правильность нот, считает комбо и процент точности.
+                  {t('pillar_karaoke_desc')}
                 </p>
               </div>
               <div className="mt-4 flex items-center text-xs font-bold text-rose-300 group-hover:translate-x-1 transition-transform">
-                <span>Сыграть в караоке</span>
+                <span>{t('pillar_karaoke_action')}</span>
                 <ArrowRight size={14} className="ml-1" />
               </div>
             </Link>
@@ -191,18 +192,18 @@ export default function Landing() {
                     <Mic size={24} />
                   </div>
                   <span className="text-[10px] uppercase font-bold text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">
-                    Нейросеть
+                    {t('pill_ai')}
                   </span>
                 </div>
                 <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
-                  ИИ-распознавание табулатур
+                  {t('pillar_ai_title')}
                 </h3>
                 <p className="text-xs text-stone-400 mt-1.5 leading-relaxed">
-                  Запишите исполнение мелодии или загрузите трек, и нейросеть автоматически транскрибирует аудио в лады на грифе.
+                  {t('pillar_ai_desc')}
                 </p>
               </div>
               <div className="mt-4 flex items-center text-xs font-bold text-purple-300 group-hover:translate-x-1 transition-transform">
-                <span>Записать с ИИ</span>
+                <span>{t('pillar_ai_action')}</span>
                 <ArrowRight size={14} className="ml-1" />
               </div>
             </Link>
@@ -213,29 +214,29 @@ export default function Landing() {
         <section className="w-full max-w-4xl px-4 sm:px-6 py-6">
           <div className="p-6 rounded-3xl bg-gradient-to-r from-[#2B1B12] via-[#20140D] to-[#160E0A] border-2 border-amber-500/40 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-600 to-emerald-600 p-1 shadow-xl shrink-0">
-                <div className="w-full h-full rounded-full bg-[#1A1009] flex items-center justify-center text-amber-300 font-black text-xl">
-                  Н
+              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-600 to-emerald-600 p-1 shadow-xl shrink-0 overflow-hidden">
+                <div className="w-full h-full rounded-full bg-[#1A1009] overflow-hidden flex items-center justify-center">
+                  <NuraliAvatar />
                 </div>
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-black text-white">
-                    Познакомьтесь с Нурали
+                    {t('nurali_showcase_title')}
                   </h3>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/40">
-                    ИИ-наставник
+                    {t('nurali_badge')}
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-stone-300 mt-1 leading-relaxed max-w-lg">
-                  Персональный ментор на базе Google Gemini прямо на сайте. Следит за вашей игрой, подсказывает штрихи қағыс и отвечает на любые вопросы о кюях Курмангазы, Дины и Таттимбета.
+                  {t('nurali_showcase_desc')}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="text-xs text-amber-300 font-bold hidden sm:inline">
-                Нажмите на иконку справа внизу 👉
+                {t('nurali_click_hint')}
               </span>
             </div>
           </div>
@@ -246,13 +247,13 @@ export default function Landing() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
               <Music size={20} className="text-amber-400" />
-              <span>Популярные кюи в каталоге</span>
+              <span>{t('popular_title')}</span>
             </h2>
             <Link
               href="/main"
               className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
             >
-              <span>Весь каталог ({SONGS.length})</span>
+              <span>{t('popular_all')} ({SONGS.length})</span>
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -269,12 +270,12 @@ export default function Landing() {
                     {song.title}
                   </h4>
                   <p className="text-xs text-stone-400 mt-0.5 line-clamp-1">
-                    {song.author || 'Халық күйі'}
+                    {song.author || t('default_author')}
                   </p>
                 </div>
                 <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-stone-400">
-                  <span>{song.sections.length} части</span>
-                  <span className="text-amber-400 font-medium">Разобрать</span>
+                  <span>{song.sections.length} {t('parts_count')}</span>
+                  <span className="text-amber-400 font-medium">{t('popular_learn')}</span>
                 </div>
               </Link>
             ))}

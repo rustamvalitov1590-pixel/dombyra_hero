@@ -37,7 +37,7 @@ export default function LanguageSwitcher() {
           onClick={() => setIsOpen(!isOpen)}
         >
           <Globe className="mr-1.5 h-3.5 w-3.5 text-amber-400" />
-          <span>{languages.find((lang) => lang.code === locale)?.name || 'Язык'}</span>
+          <span>{languages.find((lang) => lang.code === locale)?.name || (locale === 'kk' ? 'Тіл' : 'Язык')}</span>
           <ChevronDown className="ml-1.5 h-3.5 w-3.5 text-stone-400" />
         </button>
       </div>

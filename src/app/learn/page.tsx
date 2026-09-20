@@ -7,8 +7,10 @@ import InteractiveNeck from '@/components/fretboard/InteractiveNeck';
 import dombyraAudio from '@/utils/dombyraAudio';
 import { Play, Pause, RotateCcw, Repeat, ChevronRight, Music, Volume2, Sparkles, BookOpen } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function LearnPage() {
+  const t = useTranslations('learn');
   const [selectedSongIndex, setSelectedSongIndex] = useState<number>(3); // Default to 'Адай' or 'Еркем-ай'
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number>(0);
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
@@ -121,13 +123,13 @@ export default function LearnPage() {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
-                Тренажёр домбры
+                {t('title')}
                 <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  AI Интерактив
+                  {t('badge')}
                 </span>
               </h1>
               <p className="text-xs text-[#E8DBCF]/70">
-                Разучивайте кюи нота за нотой с синхронным грифом и табулатурой
+                {t('subtitle')}
               </p>
             </div>
           </div>
@@ -137,13 +139,13 @@ export default function LearnPage() {
               href="/tuner"
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors"
             >
-              Тюнер
+              {t('btn_tuner')}
             </Link>
             <Link
               href="/karaoke"
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors"
             >
-              Караоке
+              {t('btn_karaoke')}
             </Link>
           </div>
         </div>
@@ -151,11 +153,11 @@ export default function LearnPage() {
         {/* Song Selector Carousel / Dropdown */}
         <div className="w-full bg-[#1E1410] border border-[#3d291e] rounded-2xl p-3 sm:p-4 shadow-lg flex flex-col gap-3">
           <div className="flex items-center justify-between text-xs text-amber-300/80 font-semibold uppercase tracking-wider">
-            <span>Каталог кюев и песен ({SONGS.length})</span>
+            <span>{t('catalog_title')} ({SONGS.length})</span>
             <span>
-              Строй:{' '}
+              {t('tuning_label')}{' '}
               <strong className="text-amber-300">
-                {song.tuning_key === 'teris' ? 'Теріс бұрау (G3/C3)' : 'Оң бұрау (G3/D3)'}
+                {song.tuning_key === 'teris' ? t('tuning_teris') : t('tuning_standard')}
               </strong>
             </span>
           </div>
@@ -172,7 +174,7 @@ export default function LearnPage() {
                 }`}
               >
                 <span>{s.title}</span>
-                <span className="text-[10px] font-normal opacity-70">{s.author || 'Халық күйі'}</span>
+                <span className="text-[10px] font-normal opacity-70">{s.author || t('default_author')}</span>
               </button>
             ))}
           </div>
@@ -191,21 +193,21 @@ export default function LearnPage() {
               }`}
             >
               {isPlaying ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
-              <span>{isPlaying ? 'Тоқтату / Стоп' : 'Ойнату / Играть'}</span>
+              <span>{isPlaying ? t('stop') : t('play')}</span>
             </button>
 
             <button
               onClick={handleReset}
-              title="Басына / С начала"
+              title={t('restart')}
               className="px-3 py-2 rounded-xl bg-[#2a1d17] hover:bg-[#38271f] border border-[#493123] text-stone-200 text-xs font-bold flex items-center gap-1.5 transition-colors"
             >
               <RotateCcw size={14} />
-              <span className="hidden sm:inline">Басына</span>
+              <span className="hidden sm:inline">{t('restart')}</span>
             </button>
 
             <button
               onClick={() => setLoopSection((prev) => !prev)}
-              title="Зациклить часть"
+              title={t('repeat_tooltip')}
               className={`px-3 py-2 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition-colors ${
                 loopSection
                   ? 'bg-purple-900/60 border-purple-500 text-purple-200 shadow-[0_0_12px_rgba(124,58,237,0.4)]'
@@ -213,13 +215,13 @@ export default function LearnPage() {
               }`}
             >
               <Repeat size={14} />
-              <span className="hidden sm:inline">Қайталау</span>
+              <span className="hidden sm:inline">{t('repeat')}</span>
             </button>
           </div>
 
           {/* Center Position & Step Counter Badge */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-950/80 border border-purple-500/40 text-xs font-mono text-amber-300 font-bold">
-            {currentSection.name || `ЧАСТЬ ${currentSectionIndex + 1}`} · ҚАДАМ: {currentStepIndex + 1} / {currentSection.steps.length}
+            {t('part')} {currentSectionIndex + 1} · {t('step')} {currentStepIndex + 1} / {currentSection.steps.length}
           </div>
 
           {/* Speed Presets */}
@@ -252,11 +254,10 @@ export default function LearnPage() {
         <div className="w-full flex flex-col gap-2">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-sm font-bold uppercase tracking-wider text-amber-300">
-              Табулатура: {song.title}
+              {t('tablature_title')} {song.title}
             </h2>
             <span className="text-xs text-stone-400">
-              Часть {currentSectionIndex + 1} из {song.sections.length} · Нота {currentStepIndex + 1}/
-              {currentSection.steps.length}
+              {t('part')} {currentSectionIndex + 1} {t('of')} {song.sections.length} · {t('note')} {currentStepIndex + 1} / {currentSection.steps.length}
             </span>
           </div>
 

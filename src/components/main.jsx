@@ -22,7 +22,7 @@ const MainPage = () => {
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
         <input
           type="text"
-          placeholder="Поиск кюя: Адай, Көроғлы, Еркем-ай, Runaway..."
+          placeholder={t('search_placeholder')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full h-11 pl-10 pr-4 bg-[#1E1410] border border-[#3d291e] rounded-xl text-sm text-[#F4EFE6] placeholder:text-stone-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-inner"
@@ -41,19 +41,19 @@ const MainPage = () => {
               <BookOpen size={20} />
             </div>
             <span className="text-[10px] uppercase font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
-              Табулатуры
+              {t('tabs_badge')}
             </span>
           </div>
           <div>
             <h3 className="font-bold text-base text-white group-hover:text-amber-300 transition-colors">
-              Тренажёр кюев
+              {t('trainer_title')}
             </h3>
             <p className="text-xs text-stone-400 mt-1 leading-relaxed">
-              Синхронный гриф, ноты по тактам и замедленный темп от 0.4×
+              {t('trainer_desc')}
             </p>
           </div>
           <div className="mt-3 flex items-center text-xs font-semibold text-amber-300 group-hover:translate-x-1 transition-transform">
-            <span>Начать обучение</span>
+            <span>{t('trainer_action')}</span>
             <ArrowRight size={14} className="ml-1" />
           </div>
         </Link>
@@ -68,19 +68,19 @@ const MainPage = () => {
               <SlidersHorizontal size={20} />
             </div>
             <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-              Микрофон
+              {t('mic_badge')}
             </span>
           </div>
           <div>
             <h3 className="font-bold text-base text-white group-hover:text-emerald-300 transition-colors">
-              Тюнер домбры
+              {t('tuner_title')}
             </h3>
             <p className="text-xs text-stone-400 mt-1 leading-relaxed">
-              Точная стрелка, прямой (G3/D3) и обратный (G3/C3) строй
+              {t('tuner_desc')}
             </p>
           </div>
           <div className="mt-3 flex items-center text-xs font-semibold text-emerald-300 group-hover:translate-x-1 transition-transform">
-            <span>Настроить домбру</span>
+            <span>{t('tuner_action')}</span>
             <ArrowRight size={14} className="ml-1" />
           </div>
         </Link>
@@ -95,19 +95,19 @@ const MainPage = () => {
               <Trophy size={20} />
             </div>
             <span className="text-[10px] uppercase font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full">
-              Игра
+              {t('game_badge')}
             </span>
           </div>
           <div>
             <h3 className="font-bold text-base text-white group-hover:text-rose-300 transition-colors">
-              Караоке игра
+              {t('karaoke_title')}
             </h3>
             <p className="text-xs text-stone-400 mt-1 leading-relaxed">
-              Слушает ваш инструмент и подсвечивает попадания нот
+              {t('karaoke_desc')}
             </p>
           </div>
           <div className="mt-3 flex items-center text-xs font-semibold text-rose-300 group-hover:translate-x-1 transition-transform">
-            <span>Проверить игру</span>
+            <span>{t('karaoke_action')}</span>
             <ArrowRight size={14} className="ml-1" />
           </div>
         </Link>
@@ -117,14 +117,14 @@ const MainPage = () => {
       <div className="flex items-center justify-between pt-2">
         <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
           <Music size={20} className="text-amber-400" />
-          <span>Каталог кюев и песен</span>
+          <span>{t('catalog_title')}</span>
           <span className="text-xs text-stone-400 font-normal">({filteredSongs.length})</span>
         </h2>
         <Link
           href="/learn"
           className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
         >
-          <span>В тренажёр</span>
+          <span>{t('to_trainer')}</span>
           <ArrowRight size={14} />
         </Link>
       </div>
@@ -143,7 +143,7 @@ const MainPage = () => {
                   {song.title}
                 </h4>
                 <span className="text-xs text-stone-400 mt-0.5">
-                  {song.author || 'Халық күйі'}
+                  {song.author || t('default_author')}
                 </span>
               </div>
               <div className="w-8 h-8 rounded-lg bg-[#2c1e17] group-hover:bg-amber-500 group-hover:text-stone-950 flex items-center justify-center text-amber-400 transition-colors shrink-0">
@@ -152,9 +152,9 @@ const MainPage = () => {
             </div>
 
             <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px] text-stone-400">
-              <span>{song.sections.length} части</span>
+              <span>{song.sections.length} {t('sections_count')}</span>
               <span className="text-amber-300/80">
-                {song.tuning_key === 'teris' ? 'Теріс бұрау' : 'Оң бұрау'}
+                {song.tuning_key === 'teris' ? t('tuning_teris') : t('tuning_standard')}
               </span>
             </div>
           </Link>
@@ -169,10 +169,10 @@ const MainPage = () => {
           </div>
           <div>
             <h3 className="font-bold text-white text-sm sm:text-base">
-              Хотите разобрать свою мелодию?
+              {t('promo_title')}
             </h3>
             <p className="text-xs text-stone-400 mt-0.5">
-              Используйте наш ИИ для перевода аудиозаписи в цифровую табулатуру домбры
+              {t('promo_desc')}
             </p>
           </div>
         </div>
@@ -180,7 +180,7 @@ const MainPage = () => {
           href="/record"
           className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs whitespace-nowrap shadow-lg shadow-amber-500/20 transition-colors"
         >
-          Записать с ИИ
+          {t('promo_btn')}
         </Link>
       </div>
     </div>

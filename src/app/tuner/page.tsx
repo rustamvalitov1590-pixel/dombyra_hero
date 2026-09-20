@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import dombyraAudio from '@/utils/dombyraAudio';
 import { Mic, MicOff, Volume2, Music, CheckCircle2, ArrowUp, ArrowDown, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 interface TuningTarget {
   name: string;
@@ -12,15 +13,7 @@ interface TuningTarget {
   frequency: number;
 }
 
-const STANDARD_TUNING: TuningTarget[] = [
-  { name: 'Нижняя струна', note: 'G3', stringName: 'Н', frequency: 196.00 },
-  { name: 'Верхняя струна', note: 'D3', stringName: 'В', frequency: 146.83 },
-];
-
-const TERIS_TUNING: TuningTarget[] = [
-  { name: 'Нижняя струна', note: 'G3', stringName: 'Н', frequency: 196.00 },
-  { name: 'Верхняя струна', note: 'C3', stringName: 'В', frequency: 130.81 },
-];
+}
 
 // Time-domain autocorrelation pitch detector
 function autoCorrelate(buf: Float32Array, sampleRate: number): number {
@@ -80,12 +73,24 @@ function autoCorrelate(buf: Float32Array, sampleRate: number): number {
 }
 
 export default function TunerPage() {
+  const t = useTranslations('tuner');
+
+  const standardTargets: TuningTarget[] = [
+    { name: t('bottom_string'), note: 'G3', stringName: t('bottom_abbr'), frequency: 196.00 },
+    { name: t('top_string'), note: 'D3', stringName: t('top_abbr'), frequency: 146.83 },
+  ];
+
+  const terisTargets: TuningTarget[] = [
+    { name: t('bottom_string'), note: 'G3', stringName: t('bottom_abbr'), frequency: 196.00 },
+    { name: t('top_string'), note: 'C3', stringName: t('top_abbr'), frequency: 130.81 },
+  ];
+
   const [tuningMode, setTuningMode] = useState<'standard' | 'teris'>('standard');
   const [selectedString, setSelectedString] = useState<'auto' | 'bottom' | 'top'>('auto');
   const [isListening, setIsListening] = useState<boolean>(false);
   const [detectedFreq, setDetectedFreq] = useState<number | null>(null);
   const [centsDiff, setCentsDiff] = useState<number>(0);
-  const [activeTarget, setActiveTarget] = useState<TuningTarget>(STANDARD_TUNING[0]);
+  const [activeTarget, setActiveTarget] = useState<TuningTarget>(standardTargets[0]);
   const [micError, setMicError] = useState<string | null>(null);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -93,7 +98,7 @@ export default function TunerPage() {
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const rafIdRef = useRef<number | null>(null);
 
-  const targets = tuningMode === 'standard' ? STANDARD_TUNING : TERIS_TUNING;
+  const targets = tuningMode === 'standard' ? standardTargets : terisTargets;
 
   // Find closest target string to detected frequency
   const getClosestTarget = useCallback(
@@ -171,7 +176,7 @@ export default function TunerPage() {
       rafIdRef.current = requestAnimationFrame(processPitch);
     } catch (err: any) {
       console.error('Mic access error:', err);
-      setMicError('Разрешите доступ к микрофону в браузере для настройки домбры.');
+      setMicError(t('mic_error'));
       setIsListening(false);
     }
   };
@@ -207,33 +212,33 @@ export default function TunerPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-black tracking-tight flex items-center gap-2">
-              Тюнер домбры
+              {t('title')}
               <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                Онлайн
+                {t('online')}
               </span>
             </h1>
             <p className="text-xs text-[#E8DBCF]/70">
-              Точная настройка инструмента через микрофон
+              {t('subtitle')}
             </p>
           </div>
           <Link
             href="/learn"
             className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors"
           >
-            Тренажёр
+            {t('btn_trainer')}
           </Link>
         </div>
 
-        {/* Tuning Scheme Selector (Оң бұрау vs Теріс бұрау) */}
+        {/* Tuning Scheme Selector */}
         <div className="bg-[#1E1410] border border-[#3b271d] rounded-2xl p-4 shadow-xl flex flex-col gap-3">
           <div className="text-xs font-bold uppercase tracking-wider text-amber-400">
-            Выберите строй домбры
+            {t('select_tuning')}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => {
                 setTuningMode('standard');
-                setActiveTarget(STANDARD_TUNING[0]);
+                setActiveTarget(standardTargets[0]);
               }}
               className={`p-3 rounded-xl text-left border transition-all flex flex-col ${
                 tuningMode === 'standard'
@@ -241,14 +246,14 @@ export default function TunerPage() {
                   : 'bg-[#281b14] border-[#442b1e] text-stone-300 hover:bg-[#34241a]'
               }`}
             >
-              <span className="font-bold text-sm">Оң бұрау (Прямой)</span>
-              <span className="text-xs opacity-80">Нижняя G3 (196 Гц) · Верхняя D3 (146.8 Гц)</span>
+              <span className="font-bold text-sm">{t('standard_title')}</span>
+              <span className="text-xs opacity-80">{t('standard_desc')}</span>
             </button>
 
             <button
               onClick={() => {
                 setTuningMode('teris');
-                setActiveTarget(TERIS_TUNING[0]);
+                setActiveTarget(terisTargets[0]);
               }}
               className={`p-3 rounded-xl text-left border transition-all flex flex-col ${
                 tuningMode === 'teris'
@@ -256,8 +261,8 @@ export default function TunerPage() {
                   : 'bg-[#281b14] border-[#442b1e] text-stone-300 hover:bg-[#34241a]'
               }`}
             >
-              <span className="font-bold text-sm">Теріс бұрау (Обратный)</span>
-              <span className="text-xs opacity-80">Нижняя G3 (196 Гц) · Верхняя C3 (130.8 Гц)</span>
+              <span className="font-bold text-sm">{t('teris_title')}</span>
+              <span className="text-xs opacity-80">{t('teris_desc')}</span>
             </button>
           </div>
         </div>
@@ -272,7 +277,7 @@ export default function TunerPage() {
                 : 'text-stone-300 hover:bg-white/5'
             }`}
           >
-            Автоопределение
+            {t('auto_detect')}
           </button>
           <button
             onClick={() => {
@@ -285,7 +290,7 @@ export default function TunerPage() {
                 : 'text-stone-300 hover:bg-white/5'
             }`}
           >
-            Нижняя струна ({targets[0].note})
+            {t('bottom_string')} ({targets[0].note})
           </button>
           <button
             onClick={() => {
@@ -298,7 +303,7 @@ export default function TunerPage() {
                 : 'text-stone-300 hover:bg-white/5'
             }`}
           >
-            Верхняя струна ({targets[1].note})
+            {t('top_string')} ({targets[1].note})
           </button>
         </div>
 
@@ -312,7 +317,7 @@ export default function TunerPage() {
             <div className="text-4xl sm:text-5xl font-black text-[#F4EFE6] tracking-tight mt-1 flex items-baseline gap-2">
               {activeTarget.note}
               <span className="text-xs font-normal text-stone-400">
-                цель: {activeTarget.frequency} Гц
+                {t('target')} {activeTarget.frequency} Гц
               </span>
             </div>
           </div>
@@ -375,9 +380,9 @@ export default function TunerPage() {
 
             {/* Cents Labels */}
             <div className="absolute -bottom-2 w-full flex justify-between px-4 text-[11px] font-bold text-stone-500">
-              <span>-50 центов</span>
+              <span>{t('cents_minus')}</span>
               <span className="text-emerald-400">0</span>
-              <span>+50 центов</span>
+              <span>{t('cents_plus')}</span>
             </div>
           </div>
 
@@ -386,9 +391,9 @@ export default function TunerPage() {
             {detectedFreq ? (
               <div className="flex flex-col items-center gap-1.5 animate-fadeIn">
                 <div className="text-sm font-semibold text-stone-300">
-                  Текущий звук: <strong className="text-white text-base">{detectedFreq} Гц</strong>
+                  {t('current_sound')} <strong className="text-white text-base">{detectedFreq} Гц</strong>
                   <span className="text-xs text-stone-400 ml-2">
-                    ({centsDiff > 0 ? `+${centsDiff}` : centsDiff} центов)
+                    ({centsDiff > 0 ? `+${centsDiff}` : centsDiff} {t('cents')})
                   </span>
                 </div>
 
@@ -396,25 +401,25 @@ export default function TunerPage() {
                 {isInTune && (
                   <div className="px-4 py-2 rounded-xl bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 text-xs font-bold flex items-center gap-2 shadow-lg shadow-emerald-900/30">
                     <CheckCircle2 size={16} />
-                    <span>Струна настроена идеально!</span>
+                    <span>{t('in_tune')}</span>
                   </div>
                 )}
                 {isFlat && (
                   <div className="px-4 py-2 rounded-xl bg-amber-950/80 border border-amber-500/60 text-amber-300 text-xs font-bold flex items-center gap-2">
                     <ArrowUp size={16} />
-                    <span>Низко. Крутите колок на себя (натяните струну)</span>
+                    <span>{t('flat')}</span>
                   </div>
                 )}
                 {isSharp && (
                   <div className="px-4 py-2 rounded-xl bg-rose-950/80 border border-rose-500/60 text-rose-300 text-xs font-bold flex items-center gap-2">
                     <ArrowDown size={16} />
-                    <span>Высоко. Крутите колок от себя (ослабьте струну)</span>
+                    <span>{t('sharp')}</span>
                   </div>
                 )}
               </div>
             ) : (
               <div className="text-xs text-stone-400 flex items-center gap-1.5">
-                {isListening ? 'Защипните струну на домбре...' : 'Нажмите кнопку ниже для включения микрофона'}
+                {isListening ? t('listening') : t('mic_prompt')}
               </div>
             )}
           </div>
@@ -432,12 +437,12 @@ export default function TunerPage() {
               {isListening ? (
                 <>
                   <MicOff size={18} />
-                  <span>Остановить микрофон</span>
+                  <span>{t('btn_stop')}</span>
                 </>
               ) : (
                 <>
                   <Mic size={18} />
-                  <span>Включить микрофон</span>
+                  <span>{t('btn_start')}</span>
                 </>
               )}
             </button>
@@ -447,16 +452,16 @@ export default function TunerPage() {
           </div>
         </div>
 
-        {/* Reference Tone Audio Buttons (На слух) */}
+        {/* Reference Tone Audio Buttons */}
         <div className="bg-[#1E1410] border border-[#3b271d] rounded-2xl p-4 shadow-xl flex flex-col gap-3">
           <div className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
             <Volume2 size={16} />
-            <span>Эталонный звук (настройка на слух)</span>
+            <span>{t('ref_tone')}</span>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {targets.map((tgt) => (
               <button
-                key={tgt.name}
+                key={tgt.note + tgt.frequency}
                 onClick={() => dombyraAudio.playReferencePitch(tgt.frequency)}
                 className="px-4 py-2.5 rounded-xl bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 text-xs font-bold flex items-center justify-between transition-colors shadow"
               >
@@ -471,16 +476,16 @@ export default function TunerPage() {
         <div className="bg-[#1E1410]/70 border border-[#3b271d]/60 rounded-2xl p-4 text-xs text-stone-300 flex flex-col gap-2">
           <div className="font-bold text-amber-300 flex items-center gap-1.5">
             <HelpCircle size={15} />
-            <span>Как правильно настраивать домбру</span>
+            <span>{t('help_title')}</span>
           </div>
           <p className="leading-relaxed text-stone-400">
-            1. Включите микрофон и защипните нужную струну ногтем или медиатором.
+            {t('help_p1')}
             <br />
-            2. Следите за стрелкой: если стрелка слева (желтая зона) — струна звучит слишком низко, аккуратно поверните колок на себя, чтобы натянуть.
+            {t('help_p2')}
             <br />
-            3. Если стрелка справа (красная зона) — поверните колок от себя, чтобы опустить звук.
+            {t('help_p3')}
             <br />
-            4. Когда стрелка окажется строго по центру в зелёной зоне — струна идеально настроена.
+            {t('help_p4')}
           </p>
         </div>
       </div>

@@ -6,6 +6,7 @@ import Footer from "../../components/footer";
 import Link from "next/link";
 import { useTranslations } from 'next-intl';
 import { Upload as UploadIcon, Mic, Sparkles, Music, CheckCircle2, AlertCircle } from 'lucide-react';
+import { transcribeAudioBlob } from '@/utils/audioTranscriber';
 
 interface MidiData {
   data?: Record<string, [number, number] | any> | null;
@@ -31,30 +32,19 @@ export default function Upload() {
     setMessage('');
 
     if (!file) {
-      setMessage('Пожалуйста, выберите файл перед отправкой');
+      setMessage(t('err_no_file'));
       setUploading(false);
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const res = await fetch('https://dombyranewserver-production.up.railway.app/upload/', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      const data = await res.json();
-      setMidiNumbers(data.midi_data);
+      // Local pitch-detection transcription directly in browser
+      const midiData = await transcribeAudioBlob(file);
+      setMidiNumbers(midiData);
       setUploadStatus(true);
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      setMessage('Сервер временно недоступен. Попробуйте еще раз позже.');
+    } catch (error: any) {
+      console.error('Transcription error:', error);
+      setMessage(error?.message || t('err_failed'));
     } finally {
       setUploading(false);
     }
@@ -68,13 +58,13 @@ export default function Upload() {
             <div className="text-center">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-3 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
                 <Sparkles size={13} />
-                <span>ИИ Транскрибация</span>
+                <span>{t('tag')}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 {t('headline')}
               </h1>
               <p className="text-xs text-stone-400 mt-1 max-w-xs mx-auto">
-                Загрузите MP3 или WAV аудиозапись, чтобы нейросеть перевела звук в ноты на грифе домбры
+                {t('desc')}
               </p>
             </div>
 
@@ -84,7 +74,7 @@ export default function Upload() {
             >
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-stone-300">
-                  Выберите аудиофайл (MP3, WAV):
+                  {t('choose_file')}
                 </label>
                 <input
                   type="file"
@@ -120,7 +110,7 @@ export default function Upload() {
             </form>
 
             <div className="flex items-center gap-2 text-xs text-stone-400">
-              <span>Или запишите мелодию сразу:</span>
+              <span>{t('or_record_label')}</span>
               <Link
                 href="/record"
                 className="text-amber-400 font-bold hover:text-amber-300 flex items-center gap-1 underline underline-offset-2"
@@ -136,12 +126,12 @@ export default function Upload() {
       {uploadStatus && (
         <div className="flex-1 w-full p-4">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white">Распознанная табулатура</h2>
+            <h2 className="text-lg font-bold text-white">{t('tabs_title')}</h2>
             <button
               onClick={() => setUploadStatus(false)}
               className="px-3 py-1.5 rounded-xl bg-[#281B14] border border-[#442C20] text-xs font-bold text-stone-300 hover:text-white"
             >
-              Загрузить другой файл
+              {t('upload_another')}
             </button>
           </div>
           <Fretboard data={midiNumbers} />
