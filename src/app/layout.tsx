@@ -14,6 +14,11 @@ const inter = Inter({ subsets: ["latin", "cyrillic"] });
 export const metadata: Metadata = {
   title: "DombraHero — Онлайн-тренажёр, тюнер и караоке домбры",
   description: "Обучение игре на домбре с синхронным грифом и табулатурой, точный тюнер через микрофон и караоке с распознаванием нот.",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/favicon.ico",
+    apple: "/icon.png",
+  },
 };
 
 export default async function RootLayout({

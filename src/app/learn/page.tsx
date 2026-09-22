@@ -150,95 +150,125 @@ export default function LearnPage() {
           </div>
         </div>
 
-        {/* Song Selector Carousel / Dropdown */}
-        <div className="w-full bg-[#1E1410] border border-[#3d291e] rounded-2xl p-3 sm:p-4 shadow-lg flex flex-col gap-3">
-          <div className="flex items-center justify-between text-xs text-amber-300/80 font-semibold uppercase tracking-wider">
-            <span>{t('catalog_title')} ({SONGS.length})</span>
-            <span>
-              {t('tuning_label')}{' '}
-              <strong className="text-amber-300">
+        {/* Kui Library Selector (Dropdown List matching game.html / Screenshot 2) */}
+        <div className="w-full bg-[#1B1109]/95 border-2 border-[#8C5E1E]/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.7)] backdrop-blur-md flex flex-col gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+            <div>
+              <h2 className="font-bold text-[#FFFDF7] text-base sm:text-lg flex items-center gap-2 sm:gap-2.5">
+                <span>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="bookGoldLearn" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#FFFDF5" />
+                        <stop offset="50%" stopColor="#F5D061" />
+                        <stop offset="100%" stopColor="#8C5E1E" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" stroke="url(#bookGoldLearn)" strokeWidth="1.8" />
+                    <path d="M7 6h9M7 10h9M10 14h6" stroke="url(#bookGoldLearn)" strokeWidth="1.5" strokeLinecap="round" />
+                    <circle cx="7" cy="14" r="1.5" fill="url(#bookGoldLearn)" />
+                  </svg>
+                </span>
+                <span>{t('library_title')}</span>
+              </h2>
+              <p className="text-[11px] sm:text-xs text-[#E2C499]/80 mt-0.5 font-medium">
+                {t('author_label')}: {song.author || t('default_author')} · {t('consists_of')} {song.sections.length} {t('parts_suffix')}
+              </p>
+            </div>
+
+            {/* Tuning Badge */}
+            <div className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-black bg-gradient-to-b from-[#382315] to-[#1A0F07] text-[#FFE5A3] border border-[#D4AF37]/60 shadow-[0_2px_8px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,245,214,0.3)] flex items-center gap-1.5">
+              <span className="text-[#52B788]">✦</span>
+              <span>
                 {song.tuning_key === 'teris' ? t('tuning_teris') : t('tuning_standard')}
-              </strong>
-            </span>
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {SONGS.map((s, idx) => (
-              <button
-                key={s.id}
-                onClick={() => handleSongChange(idx)}
-                className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex flex-col items-start ${
-                  idx === selectedSongIndex
-                    ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-lg ring-2 ring-amber-400'
-                    : 'bg-[#291b14] hover:bg-[#38251b] text-stone-300 border border-[#442c20]'
-                }`}
-              >
-                <span>{s.title}</span>
-                <span className="text-[10px] font-normal opacity-70">{s.author || t('default_author')}</span>
-              </button>
-            ))}
+          {/* Styled Select Dropdown matching screenshot 2 */}
+          <div className="relative">
+            <select
+              value={selectedSongIndex}
+              onChange={(e) => handleSongChange(Number(e.target.value))}
+              className="w-full bg-[#180E08]/95 border-2 border-[#D4AF37]/50 text-[#FFFDF7] rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 pr-10 font-bold text-sm sm:text-base outline-none focus:border-[#D4AF37] focus:shadow-[0_0_15px_rgba(212,175,55,0.3)] appearance-none cursor-pointer transition-all hover:border-[#D4AF37]/80 shadow-inner"
+            >
+              {SONGS.map((s, idx) => (
+                <option key={s.id} value={idx} className="bg-[#180E08] text-[#FFFDF7] py-2">
+                  {idx + 1}. {s.title} ({s.author || t('default_author')})
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#D4AF37]">
+              <svg className="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
+            </div>
           </div>
         </div>
 
-        {/* Fixed Floating Playback Controls Pinned to Bottom */}
-        <div className="fixed bottom-4 left-3 right-3 sm:left-1/2 sm:-translate-x-1/2 sm:max-w-4xl z-50 bg-[#160c26]/95 backdrop-blur-2xl border-2 border-amber-500/40 rounded-2xl p-2.5 sm:p-3 shadow-[0_12px_40px_rgba(0,0,0,0.9),0_0_24px_rgba(124,58,237,0.4)] flex flex-wrap items-center justify-between gap-3">
-          {/* Main Play / Pause & Rewind Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              onClick={handleTogglePlay}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all active:scale-95 shadow-lg ${
-                isPlaying
-                  ? 'bg-gradient-to-r from-amber-600 to-red-600 text-white shadow-amber-600/50'
-                  : 'bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 text-white shadow-indigo-600/50 ring-2 ring-indigo-400'
-              }`}
-            >
-              {isPlaying ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
-              <span>{isPlaying ? t('stop') : t('play')}</span>
-            </button>
-
-            <button
-              onClick={handleReset}
-              title={t('restart')}
-              className="px-3 py-2 rounded-xl bg-[#2a1d17] hover:bg-[#38271f] border border-[#493123] text-stone-200 text-xs font-bold flex items-center gap-1.5 transition-colors"
-            >
-              <RotateCcw size={14} />
-              <span className="hidden sm:inline">{t('restart')}</span>
-            </button>
-
-            <button
-              onClick={() => setLoopSection((prev) => !prev)}
-              title={t('repeat_tooltip')}
-              className={`px-3 py-2 rounded-xl text-xs font-bold border flex items-center gap-1.5 transition-colors ${
-                loopSection
-                  ? 'bg-purple-900/60 border-purple-500 text-purple-200 shadow-[0_0_12px_rgba(124,58,237,0.4)]'
-                  : 'bg-[#2a1d17] border-[#493123] text-stone-300 hover:bg-[#38271f]'
-              }`}
-            >
-              <Repeat size={14} />
-              <span className="hidden sm:inline">{t('repeat')}</span>
-            </button>
-          </div>
-
-          {/* Center Position & Step Counter Badge */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-950/80 border border-purple-500/40 text-xs font-mono text-amber-300 font-bold">
-            {t('part')} {currentSectionIndex + 1} · {t('step')} {currentStepIndex + 1} / {currentSection.steps.length}
-          </div>
-
-          {/* Speed Presets */}
-          <div className="flex items-center gap-1 bg-[#140b07] p-1 rounded-xl border border-[#3b261b]">
-            {[0.4, 0.6, 0.8, 1.0].map((spd) => (
+        {/* Fixed Floating Playback Controls Pinned to Viewport Bottom (matching Screenshot 1) */}
+        <div className="fixed bottom-2.5 sm:bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-4xl z-50 bg-[#1B1109]/95 backdrop-blur-md border-2 border-[#8C6239]/80 rounded-2xl p-2 sm:p-2.5 shadow-[0_12px_36px_rgba(0,0,0,0.95),0_2px_8px_rgba(140,98,57,0.35)] flex flex-col md:flex-row items-center justify-between gap-2.5 transition-all">
+          {/* Main Action Buttons & Counter */}
+          <div className="flex items-center justify-between md:justify-start gap-2 sm:gap-3 w-full md:w-auto flex-shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
               <button
-                key={spd}
-                onClick={() => setPlaySpeed(spd)}
-                className={`px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  playSpeed === spd
-                    ? 'bg-amber-500 text-stone-950 shadow-md ring-1 ring-amber-400'
-                    : 'text-stone-300 hover:bg-white/10'
+                onClick={handleTogglePlay}
+                className="whitespace-nowrap px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#996515] text-[#1A0F07] font-black text-xs sm:text-sm shadow-[0_4px_14px_rgba(184,134,11,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0"
+              >
+                {isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5 fill-current" />}
+                <span>{isPlaying ? t('stop') : t('play')}</span>
+              </button>
+
+              <button
+                onClick={handleReset}
+                title={t('restart')}
+                className="whitespace-nowrap px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-[#2E1A0F] hover:bg-[#3D2314] text-[#E2C499] hover:text-[#FFF8E7] border border-[#6B4423]/60 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0"
+              >
+                <RotateCcw size={14} />
+                <span className="hidden sm:inline">{t('restart')}</span>
+              </button>
+
+              <button
+                onClick={() => setLoopSection((prev) => !prev)}
+                title={t('repeat_tooltip')}
+                className={`whitespace-nowrap px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl border font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0 ${
+                  loopSection
+                    ? 'bg-[#6B4223] text-[#FFF8E7] border-[#D4AF37] shadow-sm'
+                    : 'bg-[#2E1A0F] hover:bg-[#3D2314] text-[#E2C499] hover:text-[#FFF8E7] border-[#6B4423]/60'
                 }`}
               >
-                {spd}×
+                <Repeat size={14} />
+                <span className="hidden sm:inline">{t('repeat')}</span>
               </button>
-            ))}
+            </div>
+
+            {/* Center Position & Step Counter Badge: ЧАСТЬ 1 - ШАГ: 1 / 15 */}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#26160C] border border-[#8C5E1E]/60 text-xs font-mono text-[#F5EBE0] font-bold whitespace-nowrap flex-shrink-0">
+              {t('part').toUpperCase()} {currentSectionIndex + 1} - {t('step')} {currentStepIndex + 1} / {currentSection.steps.length}
+            </div>
+          </div>
+
+          {/* Speed Presets & Tempo BPM */}
+          <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto pt-1.5 md:pt-0 border-t border-[#8C6239]/30 md:border-t-0 flex-shrink-0">
+            <div className="flex items-center justify-between flex-1 md:flex-initial gap-1 bg-[#160D07] p-1 rounded-xl border border-[#52331C]/60 flex-shrink-0">
+              {[0.4, 0.6, 0.8, 1.0].map((spd) => (
+                <button
+                  key={spd}
+                  onClick={() => setPlaySpeed(spd)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                    playSpeed === spd
+                      ? 'bg-[#B8860B]/30 text-[#FFF8E7] border border-[#D4AF37]/70 shadow-sm'
+                      : 'text-[#C89D66] hover:text-white'
+                  }`}
+                >
+                  {spd}×
+                </button>
+              ))}
+            </div>
+
+            <div className="text-xs text-[#E2C499] font-mono px-2.5 py-1.5 bg-[#140904] rounded-lg border border-[#6B4423]/50 flex-shrink-0 whitespace-nowrap">
+              <span className="font-bold text-[#E2C499]">100 BPM</span>
+            </div>
           </div>
         </div>
 

@@ -26,8 +26,10 @@ export default function NuraliMascot() {
   const pathname = usePathname();
   const t = useTranslations('nurali');
 
-  // 3D Parallax Tilt state (tracking mouse across the viewport)
+  // 3D Parallax Tilt & Pupil tracking states
   const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
+  const [pupilOffset, setPupilOffset] = useState({ x: 0, y: 0 });
+  const [isBlinking, setIsBlinking] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
   const [isCheering, setIsCheering] = useState(false);
@@ -53,7 +55,7 @@ export default function NuraliMascot() {
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const bubbleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 3D Tilt calculation based on mouse cursor position
+  // 3D Tilt & Eye tracking based on mouse cursor
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!mascotRef.current) return;
@@ -61,18 +63,40 @@ export default function NuraliMascot() {
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
-      const dx = e.clientX - centerX;
-      const dy = e.clientY - centerY;
+      const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+      const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+      const strength = Math.min(1, dist / 240);
 
-      // Realistic 3D angle range
-      const rotateY = Math.max(-20, Math.min(20, dx / 35));
-      const rotateX = Math.max(-12, Math.min(12, -dy / 45));
+      // Eye pupils: max 15px X, 10px Y inside SVG units
+      const dx = Math.cos(angle) * (strength * 15);
+      const dy = Math.sin(angle) * (strength * 10);
+      setPupilOffset({ x: Number(dx.toFixed(2)), y: Number(dy.toFixed(2)) });
 
-      setTilt({ rotateX, rotateY });
+      // Head 3D tilt
+      const tiltY = Math.cos(angle) * (strength * 12);
+      const tiltX = -Math.sin(angle) * (strength * 8);
+      setTilt({ rotateX: Number(tiltX.toFixed(2)), rotateY: Number(tiltY.toFixed(2)) });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Natural eyelid blinking effect (every 3-5.5 seconds)
+  useEffect(() => {
+    let blinkTimer: NodeJS.Timeout;
+    const scheduleBlink = () => {
+      const delay = Math.random() * 2500 + 3000;
+      blinkTimer = setTimeout(() => {
+        setIsBlinking(true);
+        setTimeout(() => {
+          setIsBlinking(false);
+          scheduleBlink();
+        }, 130);
+      }, delay);
+    };
+    scheduleBlink();
+    return () => clearTimeout(blinkTimer);
   }, []);
 
   // Text-To-Speech (SpeechSynthesis) function
@@ -221,51 +245,109 @@ export default function NuraliMascot() {
           </div>
         )}
 
-        {/* 3D Standing Pixar Character Mascot */}
-        <div
-          className="pointer-events-auto relative cursor-pointer group"
-          onClick={() => setIsChatOpen((prev) => !prev)}
-          onMouseEnter={() => {
-            setIsHovered(true);
-            if (!isBubbleVisible && !isChatOpen) {
-              setIsBubbleVisible(true);
-            }
-          }}
-          onMouseLeave={() => setIsHovered(false)}
-          title={t('subtitle')}
-          style={{ perspective: '800px' }}
-        >
-          {/* 3D Tilt Card (Rotates towards mouse cursor) */}
-          <div
-            className="relative transition-transform duration-150 ease-out flex flex-col items-center"
-            style={{
-              transform: `rotateY(${tilt.rotateY}deg) rotateX(${tilt.rotateX}deg) ${
-                isCheering ? 'scale(1.1) translateY(-8px)' : isHovered ? 'scale(1.05)' : 'scale(1)'
-              }`,
-              transformStyle: 'preserve-3d',
+        {/* 2.5D Interactive Circular Nurali Mascot Button */}
+        <div className="pointer-events-auto relative flex flex-col items-center">
+          {/* Outer Steppe Glow Aura */}
+          <div className="absolute -inset-1.5 sm:-inset-2 rounded-full bg-gradient-to-tr from-[#D4AF37]/50 to-[#52B788]/35 blur-md opacity-75 animate-pulse pointer-events-none" />
+
+          <button
+            onClick={() => setIsChatOpen((prev) => !prev)}
+            onMouseEnter={() => {
+              setIsHovered(true);
+              if (!isBubbleVisible && !isChatOpen) {
+                setIsBubbleVisible(true);
+              }
             }}
+            onMouseLeave={() => setIsHovered(false)}
+            className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-[#2B1B12] via-[#1C1008] to-[#120905] border-2 border-[#D4AF37] p-0.5 sm:p-1 shadow-[0_8px_25px_rgba(0,0,0,0.85),0_0_15px_rgba(212,175,55,0.4)] flex items-center justify-center cursor-pointer transition-all duration-200 group overflow-hidden ${
+              isCheering ? 'scale-110 -translate-y-2' : isHovered ? 'scale-105' : 'scale-100'
+            }`}
+            title={t('subtitle')}
           >
-            {/* Smooth Floating Breathing Container */}
-            <div className="relative animate-float flex flex-col items-center">
-              {/* Pedestal Neon Glow */}
-              <div className="absolute -bottom-2 w-28 h-6 bg-gradient-to-r from-emerald-500/40 via-amber-400/60 to-cyan-500/40 rounded-full blur-md opacity-80 animate-pulse pointer-events-none" />
+            {/* 3D Parallax Head Rig */}
+            <div className="w-full h-full relative" style={{ perspective: '400px' }}>
+              <div
+                className="w-full h-full relative"
+                style={{
+                  transform: `rotateY(${tilt.rotateY}deg) rotateX(${tilt.rotateX}deg)`,
+                  transformStyle: 'preserve-3d',
+                  transition: 'transform 0.08s ease-out',
+                }}
+              >
+                <svg
+                  className="w-full h-full"
+                  viewBox="-55 10 700 700"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ overflow: 'hidden', borderRadius: '50%' }}
+                >
+                  <defs>
+                    <radialGradient id="mascotScleraGrad" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#FCFCFA" />
+                      <stop offset="70%" stopColor="#F2ECE6" />
+                      <stop offset="100%" stopColor="#D9C9BE" />
+                    </radialGradient>
+                    <clipPath id="mascot-left-socket-clip">
+                      <path d="M 138 431 C 146 413, 164 400, 188 396 C 212 399, 230 411, 242 433 C 230 448, 210 458, 180 457 C 154 448, 140 440, 138 431 Z" />
+                    </clipPath>
+                    <clipPath id="mascot-right-socket-clip">
+                      <path d="M 361 431 C 372 418, 390 402, 415 394 C 440 398, 462 408, 472 427 C 460 444, 436 453, 402 453 C 375 444, 364 438, 361 431 Z" />
+                    </clipPath>
+                  </defs>
 
-              {/* 3D Character Full Body Image */}
-              <div className="relative w-24 sm:w-28 md:w-32 drop-shadow-[0_16px_32px_rgba(0,0,0,0.85)] filter hover:brightness-105 transition-all">
-                <img
-                  src="/images/nurali-char.png"
-                  alt="Нұрәлі - Домбыра ИИ Тәлімгері"
-                  className="w-full h-auto object-contain pointer-events-none select-none"
-                  draggable={false}
-                />
-              </div>
+                  {/* Sclera (Whites) */}
+                  <ellipse cx="190" cy="427" rx="56" ry="33" fill="url(#mascotScleraGrad)" />
+                  <ellipse cx="416.5" cy="424" rx="58" ry="33" fill="url(#mascotScleraGrad)" />
 
-              {/* Status Pill Badge below pedestal */}
-              <div className="mt-1 px-2.5 py-0.5 rounded-full bg-[#180E08]/90 border border-amber-500/50 shadow-lg backdrop-blur-sm flex items-center gap-1.5 text-[10px] font-bold text-amber-300 group-hover:border-amber-400 group-hover:text-white transition-colors">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                <span>{t('title')}</span>
+                  {/* Left Eye (Iris + Eyelid) */}
+                  <g clipPath="url(#mascot-left-socket-clip)">
+                    <g transform={`translate(${pupilOffset.x}, ${pupilOffset.y})`}>
+                      <image href="/images/nurali_iris.png" x="156" y="393" width="68" height="68" />
+                    </g>
+                    <rect
+                      x="130"
+                      y="380"
+                      width="120"
+                      height="90"
+                      fill="#DEAB82"
+                      transform={`translate(0, ${isBlinking ? 0 : -90})`}
+                      style={{ transition: 'transform 0.07s ease-in-out' }}
+                    />
+                  </g>
+
+                  {/* Right Eye (Iris + Eyelid) */}
+                  <g clipPath="url(#mascot-right-socket-clip)">
+                    <g transform={`translate(${pupilOffset.x}, ${pupilOffset.y})`}>
+                      <image href="/images/nurali_iris.png" x="382.5" y="390" width="68" height="68" />
+                    </g>
+                    <rect
+                      x="350"
+                      y="380"
+                      width="130"
+                      height="90"
+                      fill="#DEAB82"
+                      transform={`translate(0, ${isBlinking ? 0 : -90})`}
+                      style={{ transition: 'transform 0.07s ease-in-out' }}
+                    />
+                  </g>
+
+                  {/* High-Res Face Cutout */}
+                  <image href="/images/nurali_face_cutout.png" x="0" y="0" width="600" height="896" pointerEvents="none" />
+                </svg>
               </div>
             </div>
+
+            {/* Online notification pulse dot */}
+            <span className="absolute top-1 right-1 flex h-3.5 w-3.5 pointer-events-none">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#52B788] opacity-75" />
+              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#52B788] border-2 border-[#1A1009]" />
+            </span>
+          </button>
+
+          {/* Status Pill Badge below button */}
+          <div className="mt-1 px-2.5 py-0.5 rounded-full bg-[#180E08]/90 border border-amber-500/50 shadow-lg backdrop-blur-sm flex items-center gap-1.5 text-[10px] font-bold text-amber-300 pointer-events-auto">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span>{t('title')}</span>
           </div>
         </div>
       </div>
