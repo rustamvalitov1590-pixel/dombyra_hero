@@ -1063,7 +1063,7 @@ tailwind.config = {
   <!-- ══════════════════════════════════════════
        MODULE 3: SIMULATOR & TABS
   ══════════════════════════════════════════ -->
-  <div id="module-simulator" class="module-panel active">
+  <div id="module-simulator" class="module-panel active pb-28 sm:pb-32">
     <!-- Song Selector -->
     <div class="mb-3 sm:mb-6 card-glass rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-[#8C5E1E]/50 shadow-[0_8px_30px_rgba(0,0,0,0.7)]">
       <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
@@ -1183,40 +1183,40 @@ tailwind.config = {
     </div>
 
     <!-- Fixed Floating Playback Controls Pinned to Viewport Bottom (Kazakh Steppe & Sand Heritage Style) -->
-    <div id="sim-floating-controls" class="fixed bottom-2.5 sm:bottom-3 md:bottom-4 left-2 right-2 md:left-1/2 md:-translate-x-1/2 md:max-w-4xl z-[90] bg-[#1B1109]/95 backdrop-blur-md border-2 border-[#8C6239]/80 rounded-2xl p-2 sm:p-3 shadow-[0_12px_36px_rgba(0,0,0,0.95),0_2px_8px_rgba(140,98,57,0.35)] flex flex-col md:flex-row md:items-center justify-between gap-2 transition-all">
-      <!-- Top / Main Row on Mobile -->
-      <div class="flex items-center justify-between md:justify-start gap-1.5 sm:gap-3 w-full md:w-auto">
-        <div class="flex items-center gap-1.5 sm:gap-2">
-          <button onclick="togglePlayTabs()" id="sim-play-btn" class="ripple-btn px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#996515] text-[#1A0F07] font-black text-xs sm:text-sm shadow-[0_4px_14px_rgba(184,134,11,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer">
+    <div id="sim-floating-controls" class="fixed bottom-2.5 sm:bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-5xl z-[90] bg-[#1B1109]/95 backdrop-blur-md border-2 border-[#8C6239]/80 rounded-2xl p-2 sm:p-3 shadow-[0_12px_36px_rgba(0,0,0,0.95),0_2px_8px_rgba(140,98,57,0.35)] flex flex-col lg:flex-row items-center justify-between gap-2.5 transition-all">
+      <!-- Top / Main Row on Mobile, Left side on Desktop -->
+      <div class="flex items-center justify-between lg:justify-start gap-2 sm:gap-3 w-full lg:w-auto flex-shrink-0">
+        <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+          <button onclick="togglePlayTabs()" id="sim-play-btn" class="ripple-btn whitespace-nowrap px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#996515] text-[#1A0F07] font-black text-xs sm:text-sm shadow-[0_4px_14px_rgba(184,134,11,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0">
             <span id="sim-play-icon" class="flex items-center"><svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
             <span id="sim-play-text">Играть</span>
           </button>
-          <button onclick="resetSimPlayback()" id="sim-reset-btn" class="px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#2E1A0F] hover:bg-[#3D2314] text-[#E2C499] hover:text-[#FFF8E7] border border-[#6B4423]/60 font-bold text-xs transition-all flex items-center gap-1 cursor-pointer" title="В начало">
-            <svg class="w-3.5 h-3.5 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          <button onclick="resetSimPlayback()" id="sim-reset-btn" class="whitespace-nowrap px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-[#2E1A0F] hover:bg-[#3D2314] text-[#E2C499] hover:text-[#FFF8E7] border border-[#6B4423]/60 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0" title="В начало">
+            <svg class="w-3.5 h-3.5 stroke-current flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
             <span id="sim-reset-text" class="hidden sm:inline">В начало</span>
           </button>
-          <button onclick="toggleLoopSection()" id="sim-loop-btn" class="px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#2E1A0F] text-[#E2C499] hover:text-[#FFF8E7] border border-[#6B4423]/60 font-bold text-xs transition-all flex items-center gap-1 cursor-pointer" title="Зациклить воспроизведение">
-            <svg class="w-3.5 h-3.5 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+          <button onclick="toggleLoopSection()" id="sim-loop-btn" class="whitespace-nowrap px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-[#2E1A0F] hover:bg-[#3D2314] text-[#E2C499] hover:text-[#FFF8E7] border border-[#6B4423]/60 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0" title="Зациклить воспроизведение">
+            <svg class="w-3.5 h-3.5 stroke-current flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
             <span id="sim-loop-text" class="hidden sm:inline">Повтор</span>
           </button>
         </div>
 
         <!-- Center badge with current part & step -->
-        <div class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#26160C] border border-[#8C5E1E]/60 text-xs font-mono text-[#F5EBE0] font-bold sim-position-counter-text flex-shrink-0" id="sim-floating-counter">
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#26160C] border border-[#8C5E1E]/60 text-xs font-mono text-[#F5EBE0] font-bold sim-position-counter-text whitespace-nowrap flex-shrink-0" id="sim-floating-counter">
           ШАГ: 0 / 0
         </div>
       </div>
 
       <!-- Bottom Row on Mobile / Right side on Desktop: Speed Pills & Tempo -->
-      <div class="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto pt-1 md:pt-0 border-t border-[#8C6239]/30 md:border-t-0">
+      <div class="flex items-center justify-between lg:justify-end gap-2 w-full lg:w-auto pt-1.5 lg:pt-0 border-t border-[#8C6239]/30 lg:border-t-0 flex-shrink-0">
         <!-- Speed Buttons Segmented Control -->
-        <div class="flex items-center justify-between flex-1 md:flex-initial gap-1 bg-[#160D07] p-1 rounded-xl border border-[#52331C]/60">
-          <button onclick="setSimSpeed(0.4)" class="sim-speed-btn flex-1 md:flex-initial text-center px-2 py-1 rounded-lg text-xs font-bold transition-all text-[#C89D66] hover:text-white" data-speed="0.4">0.4×</button>
-          <button onclick="setSimSpeed(0.6)" class="sim-speed-btn flex-1 md:flex-initial text-center px-2 py-1 rounded-lg text-xs font-bold transition-all text-[#C89D66] hover:text-white" data-speed="0.6">0.6×</button>
-          <button onclick="setSimSpeed(0.8)" class="sim-speed-btn flex-1 md:flex-initial text-center px-2 py-1 rounded-lg text-xs font-bold transition-all text-[#C89D66] hover:text-white" data-speed="0.8">0.8×</button>
-          <button onclick="setSimSpeed(1.0)" class="sim-speed-btn active flex-1 md:flex-initial text-center px-2 py-1 rounded-lg text-xs font-bold transition-all bg-[#B8860B]/30 text-[#FFF8E7] border border-[#D4AF37]/70 shadow-sm" data-speed="1.0">1.0×</button>
+        <div class="flex items-center justify-between flex-1 lg:flex-initial gap-1 bg-[#160D07] p-1 rounded-xl border border-[#52331C]/60 flex-shrink-0">
+          <button onclick="setSimSpeed(0.4)" class="sim-speed-btn flex-1 lg:flex-initial text-center px-2.5 py-1 rounded-lg text-xs font-bold transition-all text-[#C89D66] hover:text-white" data-speed="0.4">0.4×</button>
+          <button onclick="setSimSpeed(0.6)" class="sim-speed-btn flex-1 lg:flex-initial text-center px-2.5 py-1 rounded-lg text-xs font-bold transition-all text-[#C89D66] hover:text-white" data-speed="0.6">0.6×</button>
+          <button onclick="setSimSpeed(0.8)" class="sim-speed-btn flex-1 lg:flex-initial text-center px-2.5 py-1 rounded-lg text-xs font-bold transition-all text-[#C89D66] hover:text-white" data-speed="0.8">0.8×</button>
+          <button onclick="setSimSpeed(1.0)" class="sim-speed-btn active flex-1 lg:flex-initial text-center px-2.5 py-1 rounded-lg text-xs font-bold transition-all bg-[#B8860B]/30 text-[#FFF8E7] border border-[#D4AF37]/70 shadow-sm" data-speed="1.0">1.0×</button>
         </div>
-        <div class="text-xs text-[#E2C499] font-mono px-2 py-1 bg-[#140904] rounded-lg border border-[#6B4423]/50 flex-shrink-0">
+        <div class="text-xs text-[#E2C499] font-mono px-2.5 py-1.5 bg-[#140904] rounded-lg border border-[#6B4423]/50 flex-shrink-0 whitespace-nowrap">
           <span id="sim-tempo-val" class="font-bold text-[#E2C499]">100 BPM</span>
         </div>
       </div>
@@ -1472,78 +1472,49 @@ tailwind.config = {
       <!-- Character Button -->
       <button id="nurali-mascot-btn" onclick="toggleComicChatOrBubble()" onmouseenter="if(document.getElementById('nurali-comic-bubble') && document.getElementById('nurali-comic-bubble').classList.contains('opacity-0')) { const isKz = (localStorage.getItem('dombyra_lang') || 'rus') === 'kaz'; showComicBubble(isKz ? 'Сәлем! Мен сенің ойнағаныңды бақылап тұрмын 👀' : 'Привет! Я слежу за твоей игрой 👀', 3200); }" class="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-b from-[#2B1B12] via-[#1C1008] to-[#120905] border-2 border-[#D4AF37] p-0.5 sm:p-1 shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(212,175,55,0.35)] flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform duration-200 group overflow-hidden nurali-bob" title="Нурали — Нажми для подсказки или чата">
         
-        <!-- Animated SVG Face with Real Eye Tracking -->
-        <svg id="nurali-face-svg" class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="hatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#4A2A16"/>
-              <stop offset="50%" stop-color="#6E3F1F"/>
-              <stop offset="100%" stop-color="#26140A"/>
-            </linearGradient>
-            <linearGradient id="faceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#F7DFBF"/>
-              <stop offset="100%" stop-color="#DEB789"/>
-            </linearGradient>
-            <linearGradient id="goldTrim" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FFF8E7"/>
-              <stop offset="50%" stop-color="#D4AF37"/>
-              <stop offset="100%" stop-color="#8C5E1E"/>
-            </linearGradient>
-          </defs>
+        <!-- 2.5D Interactive Pixar Nurali Mascot -->
+        <div id="nurali-avatar-wrap" class="w-full h-full relative" style="perspective: 400px;">
+          <div id="nurali-head-parallax" class="w-full h-full relative" style="transform-style: preserve-3d; transition: transform 0.08s ease-out;">
+            <svg id="nurali-face-svg" class="w-full h-full" viewBox="70 120 460 460" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: hidden; border-radius: 50%;">
+              <defs>
+                <radialGradient id="gameScleraGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#FCFCFA" />
+                  <stop offset="70%" stop-color="#F2ECE6" />
+                  <stop offset="100%" stop-color="#D9C9BE" />
+                </radialGradient>
+                <clipPath id="game-left-socket-clip">
+                  <path d="M 138 431 C 146 413, 164 400, 188 396 C 212 399, 230 411, 242 433 C 230 448, 210 458, 180 457 C 154 448, 140 440, 138 431 Z" />
+                </clipPath>
+                <clipPath id="game-right-socket-clip">
+                  <path d="M 361 431 C 372 418, 390 402, 415 394 C 440 398, 462 408, 472 427 C 460 444, 436 453, 402 453 C 375 444, 364 438, 361 431 Z" />
+                </clipPath>
+              </defs>
 
-          <!-- Kazakh Borik / Takya Cap -->
-          <path d="M20 38 C20 16, 80 16, 80 38 Z" fill="url(#hatGrad)" stroke="url(#goldTrim)" stroke-width="2"/>
-          <!-- Cap Ornament Peak -->
-          <path d="M50 16 L50 9 M47 9 L53 9" stroke="url(#goldTrim)" stroke-width="2" stroke-linecap="round"/>
-          <path d="M50 9 C52 5, 55 3, 56 2" stroke="#FFF8E7" stroke-width="2" stroke-linecap="round"/>
-          <path d="M50 9 C48 5, 45 3, 44 2" stroke="#FFF8E7" stroke-width="2" stroke-linecap="round"/>
-          <!-- Gold band and ornament -->
-          <path d="M19 37 Q 50 41 81 37" stroke="url(#goldTrim)" stroke-width="3" fill="none"/>
-          <circle cx="50" cy="30" r="2.5" fill="#D4AF37"/>
+              <!-- Layer 1: Sclera (Whites) -->
+              <ellipse cx="190" cy="427" rx="56" ry="33" fill="url(#gameScleraGrad)" />
+              <ellipse cx="416.5" cy="424" rx="58" ry="33" fill="url(#gameScleraGrad)" />
 
-          <!-- Face Base -->
-          <ellipse cx="50" cy="60" rx="29" ry="27" fill="url(#faceGrad)" stroke="#7A4C18" stroke-width="1.6"/>
+              <!-- Layer 2: Left Eye (Iris + Eyelid) -->
+              <g clip-path="url(#game-left-socket-clip)">
+                <g id="nurali-left-pupil" transform="translate(0, 0)">
+                  <image href="images/nurali_iris.png" x="156" y="393" width="68" height="68" />
+                </g>
+                <rect id="nurali-left-eyelid" x="130" y="380" width="120" height="90" fill="#DEAB82" transform="translate(0, -90)" style="transition: transform 0.07s ease-in-out;" />
+              </g>
 
-          <!-- Cheeks blush -->
-          <ellipse cx="30" cy="68" rx="4.5" ry="3" fill="#FF8A8A" opacity="0.5"/>
-          <ellipse cx="70" cy="68" rx="4.5" ry="3" fill="#FF8A8A" opacity="0.5"/>
+              <!-- Layer 2: Right Eye (Iris + Eyelid) -->
+              <g clip-path="url(#game-right-socket-clip)">
+                <g id="nurali-right-pupil" transform="translate(0, 0)">
+                  <image href="images/nurali_iris.png" x="382.5" y="390" width="68" height="68" />
+                </g>
+                <rect id="nurali-right-eyelid" x="350" y="380" width="130" height="90" fill="#DEAB82" transform="translate(0, -90)" style="transition: transform 0.07s ease-in-out;" />
+              </g>
 
-          <!-- Left Eye Sclera (White) -->
-          <g id="nurali-left-eye">
-            <ellipse cx="36" cy="56" rx="7.5" ry="6.5" fill="#FFFFFF" stroke="#331A0B" stroke-width="1.3"/>
-            <!-- Pupil and Iris (Tracks Mouse) -->
-            <g id="nurali-left-pupil">
-              <circle cx="36" cy="56" r="4" fill="#1C110A"/>
-              <circle cx="36" cy="56" r="2.5" fill="#52B788" opacity="0.75"/>
-              <circle cx="37.2" cy="54.8" r="1.3" fill="#FFFFFF"/>
-            </g>
-            <!-- Eyelid for Blinking -->
-            <ellipse id="nurali-left-eyelid" cx="36" cy="56" rx="7.8" ry="6.8" fill="url(#faceGrad)" opacity="0"/>
-          </g>
-
-          <!-- Right Eye Sclera (White) -->
-          <g id="nurali-right-eye">
-            <ellipse cx="64" cy="56" rx="7.5" ry="6.5" fill="#FFFFFF" stroke="#331A0B" stroke-width="1.3"/>
-            <!-- Pupil and Iris (Tracks Mouse) -->
-            <g id="nurali-right-pupil">
-              <circle cx="64" cy="56" r="4" fill="#1C110A"/>
-              <circle cx="64" cy="56" r="2.5" fill="#52B788" opacity="0.75"/>
-              <circle cx="65.2" cy="54.8" r="1.3" fill="#FFFFFF"/>
-            </g>
-            <!-- Eyelid for Blinking -->
-            <ellipse id="nurali-right-eyelid" cx="64" cy="56" rx="7.8" ry="6.8" fill="url(#faceGrad)" opacity="0"/>
-          </g>
-
-          <!-- Eyebrows -->
-          <path d="M29 48 Q 36 46 43 48" stroke="#4A2810" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-          <path d="M57 48 Q 64 46 71 48" stroke="#4A2810" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-
-          <!-- Small Friendly Nose -->
-          <path d="M50 58 Q 51.5 62 48.5 63" stroke="#8C5E1E" stroke-width="1.3" stroke-linecap="round" fill="none"/>
-
-          <!-- Animated Mouth -->
-          <path id="nurali-mouth-path" d="M44 71 Q 50 76 56 71" stroke="#4A1E0B" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-        </svg>
+              <!-- Layer 3: High-Res Pixar Face Cutout on Top -->
+              <image href="images/nurali_face_cutout.png" x="0" y="0" width="600" height="896" pointer-events="none" />
+            </svg>
+          </div>
+        </div>
 
         <!-- Online notification pulse -->
         <span class="absolute top-1 right-1 flex h-3.5 w-3.5">
@@ -1670,28 +1641,31 @@ let nuraliBubbleTimeout = null;
 function updateNuraliEyes() {
   const leftPupil = document.getElementById('nurali-left-pupil');
   const rightPupil = document.getElementById('nurali-right-pupil');
-  if (!leftPupil || !rightPupil) return;
+  const btn = document.getElementById('nurali-mascot-btn');
+  if (!leftPupil || !rightPupil || !btn) return;
 
-  const leftBox = leftPupil.getBoundingClientRect();
-  const rightBox = rightPupil.getBoundingClientRect();
+  const rect = btn.getBoundingClientRect();
+  const btnCenterX = rect.left + rect.width / 2;
+  const btnCenterY = rect.top + rect.height / 2;
 
-  // Vector for left eye
-  const lx = leftBox.left + leftBox.width / 2;
-  const ly = leftBox.top + leftBox.height / 2;
-  const lAngle = Math.atan2(nuraliMouseY - ly, nuraliMouseX - lx);
-  const lDist = Math.min(2.8, Math.hypot(nuraliMouseX - lx, nuraliMouseY - ly) / 35);
-  const ldx = Math.cos(lAngle) * lDist;
-  const ldy = Math.sin(lAngle) * lDist;
-  leftPupil.setAttribute('transform', `translate(${ldx.toFixed(2)}, ${ldy.toFixed(2)})`);
+  const angle = Math.atan2(nuraliMouseY - btnCenterY, nuraliMouseX - btnCenterX);
+  const dist = Math.hypot(nuraliMouseX - btnCenterX, nuraliMouseY - btnCenterY);
+  const strength = Math.min(1, dist / 220);
 
-  // Vector for right eye
-  const rx = rightBox.left + rightBox.width / 2;
-  const ry = rightBox.top + rightBox.height / 2;
-  const rAngle = Math.atan2(nuraliMouseY - ry, nuraliMouseX - rx);
-  const rDist = Math.min(2.8, Math.hypot(nuraliMouseX - rx, nuraliMouseY - ry) / 35);
-  const rdx = Math.cos(rAngle) * rDist;
-  const rdy = Math.sin(rAngle) * rDist;
-  rightPupil.setAttribute('transform', `translate(${rdx.toFixed(2)}, ${rdy.toFixed(2)})`);
+  // Travel up to 15 horizontal, 10 vertical in SVG units
+  const dx = Math.cos(angle) * (strength * 15);
+  const dy = Math.sin(angle) * (strength * 10);
+
+  leftPupil.setAttribute('transform', `translate(${dx.toFixed(2)}, ${dy.toFixed(2)})`);
+  rightPupil.setAttribute('transform', `translate(${dx.toFixed(2)}, ${dy.toFixed(2)})`);
+
+  // Subtle 2.5D Head parallax tilt
+  const headParallax = document.getElementById('nurali-head-parallax');
+  if (headParallax) {
+    const tiltY = Math.cos(angle) * (strength * 10);
+    const tiltX = -Math.sin(angle) * (strength * 7);
+    headParallax.style.transform = `rotateY(${tiltY.toFixed(2)}deg) rotateX(${tiltX.toFixed(2)}deg)`;
+  }
 }
 
 // Track mouse movement
@@ -1715,52 +1689,50 @@ window.addEventListener('click', (e) => {
   nuraliMouseX = e.clientX;
   nuraliMouseY = e.clientY;
   updateNuraliEyes();
-  triggerNuraliCurious();
+  if (Math.random() < 0.25) {
+    nuraliBlink();
+  }
   if (typeof triggerBackgroundWave === 'function' && Math.random() < 0.3) {
     triggerBackgroundWave(350, 0.45, e.clientX, e.clientY);
   }
 });
 
 // Natural Random Blinking
+let isNuraliBlinking = false;
 function nuraliBlink() {
+  if (isNuraliBlinking) return;
+  isNuraliBlinking = true;
   const leftLid = document.getElementById('nurali-left-eyelid');
   const rightLid = document.getElementById('nurali-right-eyelid');
   if (leftLid && rightLid) {
-    leftLid.style.opacity = '1';
-    rightLid.style.opacity = '1';
+    leftLid.setAttribute('transform', 'translate(0, 0)');
+    rightLid.setAttribute('transform', 'translate(0, 0)');
     setTimeout(() => {
-      leftLid.style.opacity = '0';
-      rightLid.style.opacity = '0';
-    }, 130);
+      leftLid.setAttribute('transform', 'translate(0, -90)');
+      rightLid.setAttribute('transform', 'translate(0, -90)');
+      isNuraliBlinking = false;
+    }, 110);
+  } else {
+    isNuraliBlinking = false;
   }
   setTimeout(nuraliBlink, 2600 + Math.random() * 3400);
 }
 setTimeout(nuraliBlink, 1800);
 
-// Cheerful expression on good notes
+// Cheerful expression on good notes / combos
 function setNuraliHappy(msg = 'Жарайсың! 🌟') {
-  const mouth = document.getElementById('nurali-mouth-path');
   const btn = document.getElementById('nurali-mascot-btn');
-  if (mouth) mouth.setAttribute('d', 'M43 68 Q 50 78 57 68');
   if (btn) {
     btn.classList.remove('nurali-cheer');
     void btn.offsetWidth; // trigger reflow
     btn.classList.add('nurali-cheer');
   }
+  nuraliBlink();
   showComicBubble(msg, 3200);
-  setTimeout(() => {
-    if (mouth) mouth.setAttribute('d', 'M44 71 Q 50 76 56 71');
-  }, 2800);
 }
 
 function triggerNuraliCurious() {
-  if (Math.random() < 0.2) {
-    const mouth = document.getElementById('nurali-mouth-path');
-    if (mouth) mouth.setAttribute('d', 'M46 70 Q 50 73 54 70');
-    setTimeout(() => {
-      if (mouth) mouth.setAttribute('d', 'M44 71 Q 50 76 56 71');
-    }, 600);
-  }
+  nuraliBlink();
 }
 
 // Comic Speech Bubble Functions
@@ -3832,7 +3804,7 @@ const UI_STRINGS = {
     simPlayBtnPlay: "Играть",
     simPlayBtnStop: "Остановить",
     simResetBtn: "В начало",
-    simLoopBtn: "Повтор части",
+    simLoopBtn: "Повтор",
     secHeader: (name, idx) => `ЧАСТЬ ${name || (idx + 1)}`,
     secStepsCount: (count) => `${count} шагов`,
     indicatorBot: "Н",
@@ -3970,8 +3942,8 @@ const UI_STRINGS = {
     simStepSubhint: "Жеке фразаларды жаттықтыру үшін",
     simPlayBtnPlay: "Ойнату",
     simPlayBtnStop: "Тоқтату",
-    simResetBtn: "Басына қайтару",
-    simLoopBtn: "Бөлімді қайталау",
+    simResetBtn: "Басына",
+    simLoopBtn: "Қайталау",
     secHeader: (name, idx) => `${name || (idx + 1)}-БӨЛІМ`,
     secStepsCount: (count) => `${count} қадам`,
     indicatorBot: "Т",
