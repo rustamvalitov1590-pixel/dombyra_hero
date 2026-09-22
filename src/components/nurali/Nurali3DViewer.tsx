@@ -1,9 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 interface Nurali3DViewerProps {
   className?: string;
@@ -14,218 +11,146 @@ interface Nurali3DViewerProps {
 
 export const Nurali3DViewer: React.FC<Nurali3DViewerProps> = ({
   className = 'w-full h-full min-h-[300px]',
-  autoRotate = false,
-  enableControls = true,
   onLoaded,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [gaze, setGaze] = useState({ x: 0, y: 0 });
+  const [headTilt, setHeadTilt] = useState({ rotX: 0, rotY: 0 });
+  const [isBlinking, setIsBlinking] = useState(false);
 
+  // Mouse / Touch tracking
   useEffect(() => {
-    if (!containerRef.current) return;
-    const container = containerRef.current;
-    const width = container.clientWidth || 300;
-    const height = container.clientHeight || 300;
+    const handleMove = (clientX: number, clientY: number) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
 
-    // 1. Scene
-    const scene = new THREE.Scene();
+      const normX = Math.max(-1, Math.min(1, (clientX - centerX) / (window.innerWidth / 2)));
+      const normY = Math.max(-1, Math.min(1, (clientY - centerY) / (window.innerHeight / 2)));
 
-    // 2. Camera
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    camera.position.set(0, 1.25, 2.8);
+      setGaze({
+        x: normX * 15,
+        y: normY * 10,
+      });
 
-    // 3. Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(width, height);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
-    renderer.shadowMap.enabled = true;
-    container.appendChild(renderer.domElement);
+      setHeadTilt({
+        rotY: normX * 12,
+        rotX: -normY * 8,
+      });
+    };
 
-    // 4. Controls
-    let controls: OrbitControls | null = null;
-    if (enableControls) {
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-      controls.target.set(0, 0.9, 0);
-      controls.minDistance = 1.2;
-      controls.maxDistance = 5;
-    }
-
-    // 5. Lighting
-    const ambientLight = new THREE.AmbientLight(0xfff1e6, 1.3);
-    scene.add(ambientLight);
-
-    const keyLight = new THREE.DirectionalLight(0xffd59e, 2.5);
-    keyLight.position.set(3, 4, 3);
-    scene.add(keyLight);
-
-    const fillLight = new THREE.DirectionalLight(0x059669, 1.2);
-    fillLight.position.set(-3, 2, 2);
-    scene.add(fillLight);
-
-    const rimLight = new THREE.DirectionalLight(0x38bdf8, 2.0);
-    rimLight.position.set(0, 4, -4);
-    scene.add(rimLight);
-
-    // 6. GLTF Model & Bones
-    let model: THREE.Group | null = null;
-    let headBone: THREE.Object3D | null = null;
-    let neckBone: THREE.Object3D | null = null;
-    let spineBone: THREE.Object3D | null = null;
-    let rightForeArmBone: THREE.Object3D | null = null;
-    let mouseX = 0;
-    let mouseY = 0;
-
-    const loader = new GLTFLoader();
-    // Load new high-detail cartoon head model, fallback to rigged full body
-    const modelPath = '/models/cartoon_head.glb';
-
-    loader.load(
-      modelPath,
-      (gltf) => {
-        model = gltf.scene;
-
-        // Auto center and scale model
-        const box = new THREE.Box3().setFromObject(model);
-        const size = box.getSize(new THREE.Vector3());
-        const center = box.getCenter(new THREE.Vector3());
-        const scale = 1.6 / size.y;
-
-        model.scale.set(scale, scale, scale);
-        model.position.x = -center.x * scale;
-        model.position.y = -box.min.y * scale;
-        model.position.z = -center.z * scale;
-
-        // Find skeleton bones for interactive head tracking & gestures (supports both naming standards)
-        headBone = model.getObjectByName('head') || model.getObjectByName('mixamorig:Head') || null;
-        neckBone = model.getObjectByName('neck_01') || model.getObjectByName('mixamorig:Neck') || null;
-        spineBone = model.getObjectByName('spine_03') || model.getObjectByName('mixamorig:Spine1') || null;
-        rightForeArmBone = model.getObjectByName('lowerarm_r') || model.getObjectByName('mixamorig:RightForeArm') || null;
-
-        model.traverse((child) => {
-          if ((child as THREE.Mesh).isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-          }
-        });
-
-        scene.add(model);
-        setIsLoaded(true);
-        if (onLoaded) onLoaded();
-      },
-      (xhr) => {
-        if (xhr.lengthComputable) {
-          setLoadingProgress(Math.round((xhr.loaded / xhr.total) * 100));
-        }
-      },
-      (err) => {
-        console.error('Error loading 3D Nurali rigged model:', err);
-        setError('Не удалось загрузить 3D модель');
+    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches && e.touches[0]) {
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
       }
-    );
-
-    // 7. Mouse move for Head/Neck Tracking
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      mouseX = Math.max(-1, Math.min(1, (e.clientX - cx) / (window.innerWidth / 2)));
-      mouseY = Math.max(-1, Math.min(1, (e.clientY - cy) / (window.innerHeight / 2)));
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-
-    // 8. Animation Loop
-    let animId: number;
-    const clock = new THREE.Clock();
-
-    const animate = () => {
-      animId = requestAnimationFrame(animate);
-      const elapsed = clock.getElapsedTime();
-
-      // Idle breathing and gentle floating
-      if (model) {
-        model.position.y = -0.01 + Math.sin(elapsed * 2) * 0.015;
-
-        // Interactive Head & Neck Rotation following mouse
-        if (headBone && neckBone) {
-          const targetY = mouseX * 0.65;
-          const targetX = mouseY * 0.45;
-
-          headBone.rotation.y = THREE.MathUtils.lerp(headBone.rotation.y, targetY * 0.7, 0.1);
-          headBone.rotation.x = THREE.MathUtils.lerp(headBone.rotation.x, targetX * 0.6, 0.1);
-
-          neckBone.rotation.y = THREE.MathUtils.lerp(neckBone.rotation.y, targetY * 0.3, 0.1);
-          neckBone.rotation.x = THREE.MathUtils.lerp(neckBone.rotation.x, targetX * 0.3, 0.1);
-
-          if (spineBone) {
-            spineBone.rotation.y = THREE.MathUtils.lerp(spineBone.rotation.y, targetY * 0.15, 0.05);
-          }
-        } else if (!autoRotate) {
-          // Fallback whole-model look-at if bones aren't present
-          model.rotation.y = THREE.MathUtils.lerp(model.rotation.y, mouseX * 0.4, 0.05);
-        }
-
-        // Alive hand gesture: subtle friendly waving of the raised hand
-        if (rightForeArmBone) {
-          rightForeArmBone.rotation.z = Math.sin(elapsed * 3) * 0.12;
-        }
-
-        if (autoRotate) {
-          model.rotation.y += 0.008;
-        }
-      }
-
-      if (controls) controls.update();
-      renderer.render(scene, camera);
     };
 
-    animate();
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
 
-    // 9. Resize
-    const handleResize = () => {
-      if (!container) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    };
-    window.addEventListener('resize', handleResize);
+    if (onLoaded) onLoaded();
 
     return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
-      renderer.dispose();
-      if (container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement);
-      }
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('touchmove', onTouchMove);
     };
-  }, [autoRotate, enableControls, onLoaded]);
+  }, [onLoaded]);
+
+  // Natural Blinking Loop
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    const loopBlink = () => {
+      setIsBlinking(true);
+      setTimeout(() => {
+        setIsBlinking(false);
+      }, 110);
+      timeoutId = setTimeout(loopBlink, 2800 + Math.random() * 3200);
+    };
+    timeoutId = setTimeout(loopBlink, 2000);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   return (
-    <div className={`relative ${className}`}>
-      <div ref={containerRef} className="w-full h-full" />
+    <div
+      ref={containerRef}
+      className={`relative flex items-center justify-center select-none overflow-hidden ${className}`}
+      style={{ perspective: 800 }}
+    >
+      <div
+        className="relative w-full max-w-[320px] aspect-[600/896] transition-transform duration-100 ease-out"
+        style={{
+          transform: `rotateY(${headTilt.rotY.toFixed(2)}deg) rotateX(${headTilt.rotX.toFixed(2)}deg)`,
+          transformStyle: 'preserve-3d',
+        }}
+      >
+        <svg
+          viewBox="0 0 600 896"
+          className="w-full h-full"
+          style={{ overflow: 'visible' }}
+        >
+          <defs>
+            <radialGradient id="reactScleraGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#FCFCFA" />
+              <stop offset="70%" stopColor="#F2ECE6" />
+              <stop offset="100%" stopColor="#D9C9BE" />
+            </radialGradient>
+            <linearGradient id="reactEyelidShadow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#381D14" stopOpacity="0.85" />
+              <stop offset="60%" stopColor="#381D14" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#381D14" stopOpacity="0" />
+            </linearGradient>
+            <clipPath id="react-left-socket-clip">
+              <path d="M 138 431 C 146 413, 164 400, 188 396 C 212 399, 230 411, 242 433 C 230 448, 210 458, 180 457 C 154 448, 140 440, 138 431 Z" />
+            </clipPath>
+            <clipPath id="react-right-socket-clip">
+              <path d="M 361 431 C 372 418, 390 402, 415 394 C 440 398, 462 408, 472 427 C 460 444, 436 453, 402 453 C 375 444, 364 438, 361 431 Z" />
+            </clipPath>
+          </defs>
 
-      {!isLoaded && !error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm rounded-2xl gap-3 z-10">
-          <div className="w-10 h-10 border-4 border-amber-500/20 border-t-amber-400 rounded-full animate-spin" />
-          <p className="text-xs font-bold text-amber-300">
-            3D Нұрәлі моделі жүктелуде... {loadingProgress}%
-          </p>
-        </div>
-      )}
+          {/* Sclera (Eyeball Whites) */}
+          <ellipse cx="190" cy="427" rx="56" ry="33" fill="url(#reactScleraGrad)" />
+          <ellipse cx="416.5" cy="424" rx="58" ry="33" fill="url(#reactScleraGrad)" />
 
-      {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-2xl p-4 text-xs text-rose-300">
-          {error}
-        </div>
-      )}
+          {/* Left Eye Contents */}
+          <g clipPath="url(#react-left-socket-clip)">
+            <g transform={`translate(${gaze.x.toFixed(2)}, ${gaze.y.toFixed(2)})`}>
+              <image href="/images/nurali_iris.png" x="156" y="393" width="68" height="68" />
+            </g>
+            <ellipse cx="190" cy="405" rx="56" ry="20" fill="url(#reactEyelidShadow)" pointerEvents="none" />
+            <rect
+              x="130"
+              y="380"
+              width="120"
+              height="90"
+              fill="#DEAB82"
+              transform={isBlinking ? 'translate(0, 0)' : 'translate(0, -90)'}
+              style={{ transition: 'transform 0.07s ease-in-out' }}
+            />
+          </g>
+
+          {/* Right Eye Contents */}
+          <g clipPath="url(#react-right-socket-clip)">
+            <g transform={`translate(${gaze.x.toFixed(2)}, ${gaze.y.toFixed(2)})`}>
+              <image href="/images/nurali_iris.png" x="382.5" y="390" width="68" height="68" />
+            </g>
+            <ellipse cx="416.5" cy="403" rx="58" ry="20" fill="url(#reactEyelidShadow)" pointerEvents="none" />
+            <rect
+              x="350"
+              y="380"
+              width="130"
+              height="90"
+              fill="#DEAB82"
+              transform={isBlinking ? 'translate(0, 0)' : 'translate(0, -90)'}
+              style={{ transition: 'transform 0.07s ease-in-out' }}
+            />
+          </g>
+
+          {/* Pixar Face Cutout */}
+          <image href="/images/nurali_face_cutout.png" x="0" y="0" width="600" height="896" pointerEvents="none" />
+        </svg>
+      </div>
     </div>
   );
 };

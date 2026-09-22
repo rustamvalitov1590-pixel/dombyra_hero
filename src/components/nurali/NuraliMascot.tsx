@@ -306,10 +306,10 @@ export default function NuraliMascot() {
                       ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300'
                       : 'bg-amber-500/10 border-amber-500/40 text-amber-300 hover:bg-amber-500/20'
                   }`}
-                  title={show3DModel ? 'Чатқа оралу' : '3D Модельді қарау'}
+                  title={show3DModel ? 'Чатқа оралу' : 'Нұрәліні қарау'}
                 >
                   <Box size={14} />
-                  <span>{show3DModel ? 'Чат' : '3D Модель'}</span>
+                  <span>{show3DModel ? 'Чат' : 'Нұрәлі 2.5D'}</span>
                 </button>
 
                 {/* Voice toggle button */}
@@ -347,7 +347,7 @@ export default function NuraliMascot() {
               <div className="flex-1 relative flex flex-col items-center justify-center bg-[#0F0804] overflow-hidden">
                 <Nurali3DViewer autoRotate={true} enableControls={true} className="w-full h-full" />
                 <div className="absolute bottom-3 inset-x-4 px-3 py-1.5 rounded-xl bg-black/70 border border-amber-500/30 backdrop-blur-md text-[11px] text-amber-200 text-center pointer-events-none shadow-lg">
-                  ✦ Тышқанмен 360° айналдырыңыз, дөңгелекпен жақындатыңыз ✦
+                  ✦ Тышқанды қозғалтыңыз — Нұрәлі көзімен бақылайды ✦
                 </div>
               </div>
             ) : (
