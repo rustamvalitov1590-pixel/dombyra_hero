@@ -208,12 +208,17 @@ export default function NuraliMascot() {
     t('chip_strokes'),
   ];
 
+  const isLearnPage = pathname === '/learn' || pathname?.startsWith('/learn');
+  const bottomPositionClass = isLearnPage
+    ? 'bottom-48 md:bottom-20'
+    : 'bottom-20 md:bottom-20';
+
   return (
     <>
-      {/* Floating Container: Bottom-Right pinned */}
+      {/* Floating Container: Bottom-Right pinned above BottomNav */}
       <div
         ref={mascotRef}
-        className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 z-50 flex flex-col items-end pointer-events-none select-none"
+        className={`fixed ${bottomPositionClass} right-3 sm:right-6 z-50 flex flex-col items-end pointer-events-none select-none transition-all duration-300`}
       >
         {/* Comic Speech Bubble */}
         {isBubbleVisible && !isChatOpen && (

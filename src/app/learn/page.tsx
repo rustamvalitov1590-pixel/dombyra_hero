@@ -113,7 +113,7 @@ export default function LearnPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] px-3 sm:px-6 py-4 pb-28 flex flex-col items-center">
+    <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] px-3 sm:px-6 py-4 pb-60 sm:pb-52 flex flex-col items-center">
       {/* Page Title & Mode Navigation */}
       <div className="w-full max-w-4xl flex flex-col gap-4 mb-4">
         <div className="flex items-center justify-between">
@@ -206,8 +206,8 @@ export default function LearnPage() {
           </div>
         </div>
 
-        {/* Fixed Floating Playback Controls Pinned to Viewport Bottom (matching Screenshot 1) */}
-        <div className="fixed bottom-2.5 sm:bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-4xl z-50 bg-[#1B1109]/95 backdrop-blur-md border-2 border-[#8C6239]/80 rounded-2xl p-2 sm:p-2.5 shadow-[0_12px_36px_rgba(0,0,0,0.95),0_2px_8px_rgba(140,98,57,0.35)] flex flex-col md:flex-row items-center justify-between gap-2.5 transition-all">
+        {/* Fixed Floating Playback Controls Pinned Above Bottom Navigation Bar */}
+        <div className="fixed bottom-20 sm:bottom-20 md:bottom-20 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-3xl z-40 bg-[#1B1109]/95 backdrop-blur-md border-2 border-[#8C6239]/80 rounded-2xl p-2 sm:p-2.5 shadow-[0_12px_36px_rgba(0,0,0,0.95),0_2px_8px_rgba(140,98,57,0.35)] flex flex-col md:flex-row items-center justify-between gap-2.5 transition-all">
           {/* Main Action Buttons & Counter */}
           <div className="flex items-center justify-between md:justify-start gap-2 sm:gap-3 w-full md:w-auto flex-shrink-0">
             <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">

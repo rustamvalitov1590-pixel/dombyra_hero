@@ -93,7 +93,7 @@ export default function Record() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] flex flex-col">
+    <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] flex flex-col pb-24 sm:pb-28">
       {!isShowTabs && (
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
           <div className="w-full max-w-md flex flex-col items-center gap-6">

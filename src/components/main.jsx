@@ -16,7 +16,7 @@ const MainPage = () => {
   );
 
   return (
-    <div className="p-4 sm:p-6 bg-[#160E0A] text-[#F4EFE6] min-h-screen flex flex-col gap-6">
+    <div className="p-4 sm:p-6 pb-28 sm:pb-32 bg-[#160E0A] text-[#F4EFE6] min-h-screen flex flex-col gap-6">
       {/* Search Input Bar */}
       <div className="relative w-full">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" size={18} />

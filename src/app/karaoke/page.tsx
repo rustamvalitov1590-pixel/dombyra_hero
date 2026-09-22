@@ -264,7 +264,7 @@ export default function KaraokePage() {
   const accuracy = totalNotes > 0 ? Math.round(((results.perfect * 100 + results.good * 60) / (totalNotes * 100)) * 100) : 100;
 
   return (
-    <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] px-3 sm:px-6 py-4 pb-28 flex flex-col items-center">
+    <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] px-3 sm:px-6 py-4 pb-36 sm:pb-40 flex flex-col items-center">
       <div className="w-full max-w-4xl flex flex-col gap-4">
         {/* Header with Navigation */}
         <div className="flex items-center justify-between">
