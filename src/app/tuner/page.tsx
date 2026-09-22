@@ -13,8 +13,6 @@ interface TuningTarget {
   frequency: number;
 }
 
-}
-
 // Time-domain autocorrelation pitch detector
 function autoCorrelate(buf: Float32Array, sampleRate: number): number {
   const SIZE = buf.length;

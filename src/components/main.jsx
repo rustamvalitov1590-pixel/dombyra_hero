@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { SONGS, Song } from '@/data/songs';
+import { SONGS } from '@/data/songs';
 import { BookOpen, SlidersHorizontal, Trophy, Music, Sparkles, Search, ArrowRight, Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
