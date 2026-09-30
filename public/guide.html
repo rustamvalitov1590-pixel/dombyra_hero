@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Видеоинструкция — «Домбра Будущего» (для Дальмиры)</title>
+  <link rel="icon" href="./icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 50% 10%, #24140c 0%, #0d0705 100%);
+      color: #F4EFE6;
+      overflow-x: hidden;
+    }
+    .font-heading { font-family: 'Montserrat', sans-serif; }
+    .gold-gradient {
+      background: linear-gradient(135deg, #fce09b 0%, #dfa837 50%, #9e6f15 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gold-box {
+      border: 1px solid rgba(223, 168, 55, 0.35);
+      background: rgba(36, 20, 12, 0.7);
+      backdrop-filter: blur(12px);
+    }
+    .pulse-glow {
+      box-shadow: 0 0 25px rgba(223, 168, 55, 0.45);
+      animation: pulseAnimation 2s infinite ease-in-out;
+    }
+    @keyframes pulseAnimation {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(223, 168, 55, 0.3); }
+      50% { transform: scale(1.02); box-shadow: 0 0 35px rgba(223, 168, 55, 0.65); }
+    }
+    .spotlight-ring {
+      border: 3px solid #dfa837;
+      border-radius: 9999px;
+      box-shadow: 0 0 20px #dfa837, inset 0 0 15px #dfa837;
+      animation: spotlightPulse 1.5s infinite alternate;
+    }
+    @keyframes spotlightPulse {
+      from { transform: scale(0.96); opacity: 0.8; }
+      to { transform: scale(1.05); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-3 sm:p-6 select-none">
+
+  <!-- TOP HEADER -->
+  <header class="w-full max-w-5xl flex items-center justify-between py-3 px-5 rounded-2xl gold-box mb-4 shadow-2xl">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-xl">
+        🪕
+      </div>
+      <div>
+        <h1 class="text-base sm:text-lg font-heading font-black tracking-wide text-white flex items-center gap-2">
+          ДОМБРА БУДУЩЕГО <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 font-medium">Интерактивный Видеогид</span>
+        </h1>
+        <p class="text-xs text-stone-400">Научный проект Валитовой Дальмиры • 4 «В» класс • Руководитель: Науменко И.Н.</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btn-fullscreen" onclick="toggleFullScreen()" class="px-3 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-xs font-semibold border border-stone-600 transition flex items-center gap-1.5">
+        ⛶ <span class="hidden sm:inline">На весь экран</span>
+      </button>
+      <a href="/" class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 text-xs font-black transition flex items-center gap-1">
+        Открыть приложение ↗
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN INTERACTIVE VIDEO VIEWER -->
+  <main class="w-full max-w-5xl flex-1 flex flex-col rounded-3xl overflow-hidden gold-box shadow-[0_20px_50px_rgba(0,0,0,0.8)] border border-amber-500/30">
+    
+    <!-- VIDEO STAGE / SCREEN AREA -->
+    <div class="relative w-full aspect-[16/9] sm:aspect-[16/9.2] bg-black flex items-center justify-center overflow-hidden group">
+      
+      <!-- Slide Images -->
+      <img id="screen-img" src="./landing.png" alt="Скриншот экрана" class="w-full h-full object-contain transition-all duration-700" />
+
+      <!-- Interactive Highlight Overlay Markers (Spotlights) -->
+      <div id="spotlight-marker" class="absolute pointer-events-none transition-all duration-500 hidden spotlight-ring"></div>
+
+      <!-- Watermark / Step Badge in Corner -->
+      <div class="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-md border border-amber-500/40 text-xs font-bold text-amber-300 shadow-xl">
+        <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+        <span id="step-badge">ШАГ 1 ИЗ 5: ГЛАВНЫЙ ЭКРАН</span>
+      </div>
+
+      <!-- Big Center Play / Pause Indicator (shows on click or pause) -->
+      <button id="screen-play-btn" onclick="togglePlay()" class="absolute w-20 h-20 rounded-full bg-amber-500/80 hover:bg-amber-400 text-stone-950 flex items-center justify-center text-3xl font-black shadow-2xl transition transform hover:scale-110 active:scale-95">
+        <span id="play-icon">▶</span>
+      </button>
+
+      <!-- Bottom Voice Subtitles Banner -->
+      <div class="absolute bottom-3 left-4 right-4 p-3.5 rounded-2xl bg-[#160E0A]/90 backdrop-blur-md border border-amber-500/40 text-stone-200 shadow-2xl transition-all">
+        <div class="flex items-start gap-3">
+          <div id="speaker-avatar" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-300 flex-shrink-0 flex items-center justify-center text-stone-950 font-bold text-lg shadow-md">
+            👧
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between mb-1">
+              <span id="speaker-name" class="text-xs font-black text-amber-400 uppercase tracking-wider">Говорит Дальмира:</span>
+              <span id="step-timer-indicator" class="text-[11px] text-stone-400">Слайд 1 • 00:00</span>
+            </div>
+            <p id="subtitles-text" class="text-xs sm:text-sm font-medium leading-relaxed text-[#F4EFE6]">
+              «Здравствуйте, уважаемые члены жюри! Я представляю проект «Домбра будущего». Наше веб-приложение создано, чтобы помочь детям учить кюи легко и в игровой форме прямо дома!»
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIDEO TIMELINE & CONTROLS -->
+    <div class="p-4 sm:p-5 bg-[#1b0f09] border-t border-amber-900/40 flex flex-col gap-3">
+      
+      <!-- Progress Bar & Clickable Step Markers -->
+      <div class="relative w-full flex flex-col gap-1.5">
+        <div class="w-full h-2.5 bg-stone-800 rounded-full overflow-hidden cursor-pointer relative" onclick="handleTimelineClick(event)">
+          <div id="timeline-progress" class="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-300 w-[20%]"></div>
+        </div>
+
+        <!-- 5 Steps Buttons -->
+        <div class="grid grid-cols-5 gap-1 pt-1 text-[10px] sm:text-xs font-semibold text-center text-stone-400">
+          <button onclick="goToStep(0)" id="step-btn-0" class="py-1 px-1 rounded-lg text-amber-300 bg-amber-500/20 border border-amber-500/30 transition truncate">
+            1. Главная
+          </button>
+          <button onclick="goToStep(1)" id="step-btn-1" class="py-1 px-1 rounded-lg hover:text-stone-200 transition truncate">
+            2. Умный Тюнер
+          </button>
+          <button onclick="goToStep(2)" id="step-btn-2" class="py-1 px-1 rounded-lg hover:text-stone-200 transition truncate">
+            3. Гриф и Табы
+          </button>
+          <button onclick="goToStep(3)" id="step-btn-3" class="py-1 px-1 rounded-lg hover:text-stone-200 transition truncate">
+            4. ИИ Нурали
+          </button>
+          <button onclick="goToStep(4)" id="step-btn-4" class="py-1 px-1 rounded-lg hover:text-stone-200 transition truncate">
+            5. Защита проекта
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div class="flex items-center justify-between pt-1">
+        <div class="flex items-center gap-2">
+          <button onclick="prevStep()" class="p-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 transition" title="Предыдущий шаг">
+            ⏮
+          </button>
+          <button id="ctrl-play-btn" onclick="togglePlay()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-black text-xs sm:text-sm flex items-center gap-1.5 shadow-lg transition active:scale-95">
+            <span id="ctrl-play-text">▶ Запустить автопоказ</span>
+          </button>
+          <button onclick="nextStep()" class="p-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 transition" title="Следующий шаг">
+            ⏭
+          </button>
+          <button onclick="playDombyraSound()" class="hidden sm:flex items-center gap-1 px-3 py-2 rounded-xl bg-stone-900 border border-stone-700 hover:border-amber-500/50 text-amber-300 text-xs font-semibold transition" title="Звук домбры">
+            🎵 Проверить звук
+          </button>
+        </div>
+
+        <!-- Practical Hint for Dalmira -->
+        <div class="text-right text-xs text-stone-400 hidden sm:block">
+          <span class="text-amber-400 font-bold">Подсказка:</span> листайте стрелками ⬅ ➡ на клавиатуре
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- DETAILED STEP CARD / SCRIPT CARD -->
+  <section class="w-full max-w-5xl mt-4 p-5 rounded-2xl gold-box shadow-xl border border-amber-500/20">
+    <div class="flex items-center justify-between mb-3 border-b border-amber-900/30 pb-2">
+      <h2 id="card-title" class="text-base sm:text-lg font-heading font-black text-amber-300 flex items-center gap-2">
+        <span>📖 Шаг 1: Главная страница — Первое впечатление и навигация</span>
+      </h2>
+      <span id="card-duration" class="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold">
+        Время показа: 25 сек
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+      <div class="p-3.5 rounded-xl bg-stone-900/70 border border-stone-800">
+        <div class="text-amber-400 font-bold mb-1.5 flex items-center gap-1.5">
+          🎯 Что показывать и нажимать:
+        </div>
+        <ul id="card-actions" class="space-y-1.5 text-stone-300 leading-relaxed list-disc list-inside">
+          <li>Показать заголовок <b>«Домбра Будущего»</b> и бейдж <i>AI Powered</i>.</li>
+          <li>Обратить внимание на две главные кнопки: <b>«Начать обучение»</b> и <b>«Открыть тюнер»</b>.</li>
+          <li>Рассказать, что сайт работает как на ноутбуке, так и на планшете и школьном киоске.</li>
+        </ul>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-stone-900/70 border border-stone-800">
+        <div class="text-emerald-400 font-bold mb-1.5 flex items-center gap-1.5">
+          🗣 Что говорить Дальмире (текст речи):
+        </div>
+        <p id="card-speech" class="text-stone-300 leading-relaxed italic">
+          «На главном экране ребенок сразу видит дружелюбный интерфейс в теплых национальных тонах. Всего в один клик можно перейти к настройке инструмента или сразу к разучиванию любимого кюя!»
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- JAVASCRIPT LOGIC & AUDIO -->
+  <script>
+    const STEPS = [
+      {
+        badge: "ШАГ 1 ИЗ 5: ГЛАВНЫЙ ЭКРАН",
+        img: "./landing.png",
+        speaker: "Дальмира Валитова",
+        avatar: "👧",
+        subtitles: "«Здравствуйте, уважаемые члены жюри! Я представляю проект «Домбра будущего». Наше веб-приложение создано, чтобы помочь детям учить кюи легко и в игровой форме прямо дома!»",
+        title: "📖 Шаг 1: Главная страница — Первое впечатление и навигация",
+        duration: "25 сек",
+        actions: [
+          "Показать заголовок «Домбра Будущего» и статус AI-помощника.",
+          "Показать 2 кнопки быстрого старта: «Начать обучение» и «Открыть тюнер».",
+          "Прокрутить вниз к блоку опроса 17 семей (82.4% за технологии!)."
+        ],
+        speech: "«На главном экране ребенок сразу видит дружелюбный интерфейс в теплых национальных тонах. Всего в один клик можно перейти к настройке инструмента или сразу к разучиванию любимого кюя!»",
+        spotlight: { top: "42%", left: "40%", width: "180px", height: "50px" }
+      },
+      {
+        badge: "ШАГ 2 ИЗ 5: УМНЫЙ ТЮНЕР (РЕ И СОЛЬ)",
+        img: "./tuner.png",
+        speaker: "Робот Нурали (ИИ)",
+        avatar: "🤖",
+        subtitles: "«Привет, Дальмира! Давай настроим домбру! Верхняя струна — это Ре (D3, 146.8 Гц), а нижняя — Соль (G3, 196.0 Гц). Сыграй струну, а я подскажу стрелочкой!»",
+        title: "🎯 Шаг 2: Умный Тюнер — Точная настройка за 10 секунд",
+        duration: "30 сек",
+        actions: [
+          "Показать шкалу частот и индикатор настройки.",
+          "Нажать на кнопку струны Ре (146.8 Гц) для эталонного звука.",
+          "Нажать на кнопку струны Соль (196.0 Гц).",
+          "Показать кнопку «Включить микрофон» для авто-определения звука струны."
+        ],
+        speech: "«82.4% детей трудно настроить домбру дома без учителя. Наш умный тюнер слушает струну через микрофон и показывает точную подсказку: натянуть или ослабить колок!»",
+        spotlight: { top: "36%", left: "45%", width: "120px", height: "120px" }
+      },
+      {
+        badge: "ШАГ 3 ИЗ 5: ИНТЕРАКТИВНЫЕ ТАБЫ И ГРИФ",
+        img: "./learn.png",
+        speaker: "Дальмира Валитова",
+        avatar: "👧",
+        subtitles: "«Посмотрите, как это работает! Я выбираю кюй Курмангазы «Балбырауын» и нажимаю «Старт». Световой маркер движется в ритме музыки, а на грифе загорается нужный лад!»",
+        title: "🎼 Шаг 3: Интерактивный Тренажер Грифа и Ритма",
+        duration: "40 сек",
+        actions: [
+          "Показать виртуальный гриф домбры с ладами (перне) и струнами.",
+          "Нажать кнопку «Play» в плавающей нижней панели управления.",
+          "Продемонстрировать бегущие маркеры нот в такт великого кюя «Балбырауын».",
+          "Показать ползунок скорости (замедление до 0.75x для легкого разучивания)."
+        ],
+        speech: "«В стиле төкпе очень быстрый темп. Чтобы ребенок не путался, скорость можно замедлить ползунком! Пальцы сразу запоминают, какой лад зажимать!»",
+        spotlight: { top: "68%", left: "48%", width: "240px", height: "60px" }
+      },
+      {
+        badge: "ШАГ 4 ИЗ 5: РОБОТ-ДОМБРИСТ НУРАЛИ",
+        img: "./nurali_ai_response_1790761719731.png",
+        speaker: "Робот Нурали (ИИ)",
+        avatar: "🤖",
+        subtitles: "«Отличный вопрос! При игре боя кисть должна быть мягкой, свободной, как крыло птицы! Не зажимай плечо, и струны запоют звонко и радостно!»",
+        title: "🤖 Шаг 4: Чат-бот Нурали — Домашний добрый наставник",
+        duration: "30 сек",
+        actions: [
+          "Нажать на круглую иконку Нурали в правом нижнем углу экрана.",
+          "Показать диалоговое окно с приветствием на детском языке.",
+          "Выбрать быстрый вопрос: «Как правильно держать руку при бое?».",
+          "Показать подробный добрый ответ от ИИ с практическими советами."
+        ],
+        speech: "«Нурали — это наш электронный репетитор. Он не ругает за ошибки, а ласково подсказывает секреты мастерства в любое время дня и ночи!»",
+        spotlight: { top: "50%", left: "48%", width: "280px", height: "180px" }
+      },
+      {
+        badge: "ШАГ 5 ИЗ 5: ИТОГИ И ПЛАНЫ НА БУДУЩЕЕ",
+        img: "./learn_page_full_1790761558028.png",
+        speaker: "Дальмира Валитова",
+        avatar: "👧",
+        subtitles: "«Наше исследование доказало: искусственный интеллект сохраняет традиции Степи! Мы планируем установить этот тренажер на сенсорном киоске в нашей гимназии!»",
+        title: "🏆 Шаг 5: Заключение, Перспективы и Внедрение",
+        duration: "25 сек",
+        actions: [
+          "Подвести итоги научной работы и подтвердить гипотезу.",
+          "Показать планы: сенсорный киоск в холле гимназии в Уральске.",
+          "Поблагодарить жюри на двух языках: «Назар аударғандарыңызға рахмет! Спасибо за внимание!»."
+        ],
+        speech: "«Искусственный интеллект — верный друг юного музыканта. Мы соединили многовековые традиции Степи и современные цифровые технологии! Рахмет!»",
+        spotlight: { top: "10%", left: "10%", width: "0px", height: "0px" }
+      }
+    ];
+
+    let currentStep = 0;
+    let isPlaying = false;
+    let timer = null;
+    let audioCtx = null;
+
+    function renderStep(idx) {
+      currentStep = idx;
+      const step = STEPS[idx];
+
+      // Update screen image & elements
+      document.getElementById('screen-img').src = step.img;
+      document.getElementById('step-badge').innerText = step.badge;
+      document.getElementById('speaker-name').innerText = `Говорит ${step.speaker}:`;
+      document.getElementById('speaker-avatar').innerText = step.avatar;
+      document.getElementById('subtitles-text').innerText = step.subtitles;
+      document.getElementById('step-timer-indicator').innerText = `Слайд ${idx + 1} из 5 • ${step.duration}`;
+
+      // Update card
+      document.getElementById('card-title').innerText = step.title;
+      document.getElementById('card-duration').innerText = `Время показа: ${step.duration}`;
+      document.getElementById('card-speech').innerText = step.speech;
+      
+      const actionsList = document.getElementById('card-actions');
+      actionsList.innerHTML = step.actions.map(act => `<li>${act}</li>`).join('');
+
+      // Update timeline
+      const progressPercent = ((idx + 1) / STEPS.length) * 100;
+      document.getElementById('timeline-progress').style.width = `${progressPercent}%`;
+
+      // Update step buttons highlight
+      for (let i = 0; i < 5; i++) {
+        const btn = document.getElementById(`step-btn-${i}`);
+        if (i === idx) {
+          btn.className = "py-1 px-1 rounded-lg text-amber-300 bg-amber-500/20 border border-amber-500/40 font-bold transition truncate";
+        } else {
+          btn.className = "py-1 px-1 rounded-lg text-stone-400 hover:text-stone-200 transition truncate";
+        }
+      }
+
+      // Spotlight marker
+      const marker = document.getElementById('spotlight-marker');
+      if (step.spotlight && step.spotlight.width !== "0px") {
+        marker.style.top = step.spotlight.top;
+        marker.style.left = step.spotlight.left;
+        marker.style.width = step.spotlight.width;
+        marker.style.height = step.spotlight.height;
+        marker.classList.remove('hidden');
+      } else {
+        marker.classList.add('hidden');
+      }
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      const playIcon = document.getElementById('play-icon');
+      const ctrlText = document.getElementById('ctrl-play-text');
+      const centerBtn = document.getElementById('screen-play-btn');
+
+      if (isPlaying) {
+        playIcon.innerText = "⏸";
+        ctrlText.innerText = "⏸ Пауза автопоказа";
+        centerBtn.classList.add('opacity-0', 'pointer-events-none');
+        startAutoPlayLoop();
+        playDombyraSound(293.66); // D4 chime
+      } else {
+        playIcon.innerText = "▶";
+        ctrlText.innerText = "▶ Запустить автопоказ";
+        centerBtn.classList.remove('opacity-0', 'pointer-events-none');
+        clearTimeout(timer);
+      }
+    }
+
+    function startAutoPlayLoop() {
+      clearTimeout(timer);
+      // Advance step every 6 seconds in preview
+      timer = setTimeout(() => {
+        if (!isPlaying) return;
+        if (currentStep < STEPS.length - 1) {
+          goToStep(currentStep + 1);
+          startAutoPlayLoop();
+        } else {
+          goToStep(0);
+          togglePlay(); // Stop at end
+        }
+      }, 7000);
+    }
+
+    function nextStep() {
+      if (currentStep < STEPS.length - 1) {
+        goToStep(currentStep + 1);
+      } else {
+        goToStep(0);
+      }
+      playDombyraSound(392.0);
+    }
+
+    function prevStep() {
+      if (currentStep > 0) {
+        goToStep(currentStep - 1);
+      } else {
+        goToStep(STEPS.length - 1);
+      }
+      playDombyraSound(196.0);
+    }
+
+    function goToStep(idx) {
+      renderStep(idx);
+      if (isPlaying) {
+        startAutoPlayLoop();
+      }
+    }
+
+    function handleTimelineClick(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const ratio = clickX / rect.width;
+      const targetStep = Math.min(4, Math.floor(ratio * STEPS.length));
+      goToStep(targetStep);
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        document.exitFullscreen().catch(err => console.log(err));
+      }
+    }
+
+    // Web Audio Dombyra Sound Synthesizer
+    function playDombyraSound(freq = 146.8) {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        // Quick subtle pluck pitch bend
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.98, audioCtx.currentTime + 0.3);
+
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.85);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextStep();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevStep();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullScreen();
+      }
+    });
+
+    // Initialize
+    renderStep(0);
+  </script>
+</body>
+</html>

@@ -73,6 +73,15 @@ export default function Header() {
         >
           {t('record_ai')}
         </Link>
+        <a
+          href="/guide.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-amber-400 hover:bg-amber-500/15 border border-amber-500/30 transition-colors flex items-center gap-1"
+          title="Интерактивная видеоинструкция и показ для жюри"
+        >
+          <span>🎬 Инструкция</span>
+        </a>
       </nav>
 
       <LanguageSwitcher />

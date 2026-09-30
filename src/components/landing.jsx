@@ -52,22 +52,32 @@ export default function Landing() {
             </p>
 
             {/* Primary Action Buttons Grid */}
-            <div className="w-full max-w-md flex flex-col sm:flex-row items-center gap-3">
-              <Link
-                href="/learn"
-                className="w-full sm:flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-black text-sm flex items-center justify-center gap-2 shadow-[0_8px_25px_rgba(212,175,55,0.35)] transition-all transform hover:-translate-y-0.5 active:scale-95"
-              >
-                <BookOpen size={18} />
-                <span>{t('get_started_button')}</span>
-              </Link>
+            <div className="w-full max-w-md flex flex-col gap-2.5">
+              <div className="w-full flex flex-col sm:flex-row items-center gap-3">
+                <Link
+                  href="/learn"
+                  className="w-full sm:flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-black text-sm flex items-center justify-center gap-2 shadow-[0_8px_25px_rgba(212,175,55,0.35)] transition-all transform hover:-translate-y-0.5 active:scale-95"
+                >
+                  <BookOpen size={18} />
+                  <span>{t('get_started_button')}</span>
+                </Link>
 
-              <Link
-                href="/tuner"
-                className="w-full sm:flex-1 py-3.5 px-6 rounded-2xl bg-[#241710] hover:bg-[#322016] border border-amber-900/50 hover:border-amber-500/50 text-[#F4EFE6] font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all transform hover:-translate-y-0.5"
+                <Link
+                  href="/tuner"
+                  className="w-full sm:flex-1 py-3.5 px-6 rounded-2xl bg-[#241710] hover:bg-[#322016] border border-amber-900/50 hover:border-amber-500/50 text-[#F4EFE6] font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all transform hover:-translate-y-0.5"
+                >
+                  <SlidersHorizontal size={18} className="text-emerald-400" />
+                  <span>{t('open_tuner')}</span>
+                </Link>
+              </div>
+
+              <a
+                href="/guide.html"
+                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/20 to-amber-500/10 hover:from-amber-500/25 hover:to-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all transform hover:scale-[1.01]"
               >
-                <SlidersHorizontal size={18} className="text-emerald-400" />
-                <span>{t('open_tuner')}</span>
-              </Link>
+                <PlayCircle size={16} className="text-amber-400 animate-pulse" />
+                <span>🎬 Интерактивная видеоинструкция для защиты</span>
+              </a>
             </div>
 
             {/* Quick Micro Badges */}
