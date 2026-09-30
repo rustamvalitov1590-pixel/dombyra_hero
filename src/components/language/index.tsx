@@ -1,32 +1,26 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { useLocale } from 'next-intl';
 import { ChevronDown, Globe } from 'lucide-react';
 
 const languages = [
-  { code: 'kk', name: 'Қазақ тілі', flag: '🇰🇿' },
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'kk', name: 'Қазақ тілі', flag: '🇰🇿' },
 ];
 
 export default function LanguageSwitcher() {
-  const router = useRouter();
-  const [locale, setLocale] = useState('ru');
+  const activeLocale = useLocale();
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    const localeCookie = document.cookie.split('; ').find((row) => row.startsWith('locale='));
-    if (localeCookie) {
-      setLocale(localeCookie.split('=')[1]);
-    }
-  }, []);
-
   const changeLanguage = (newLocale: string) => {
-    document.cookie = `locale=${newLocale}; path=/`;
-    setLocale(newLocale);
+    // 1-year persistent cookie with SameSite=Lax
+    document.cookie = `locale=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
     setIsOpen(false);
-    router.refresh();
+    window.location.reload();
   };
+
+  const currentLang = languages.find((l) => l.code === activeLocale) || languages[0];
 
   return (
     <div className="relative inline-block text-left z-50">
@@ -37,19 +31,19 @@ export default function LanguageSwitcher() {
           onClick={() => setIsOpen(!isOpen)}
         >
           <Globe className="mr-1.5 h-3.5 w-3.5 text-amber-400" />
-          <span>{languages.find((lang) => lang.code === locale)?.name || (locale === 'kk' ? 'Тіл' : 'Язык')}</span>
+          <span>{currentLang.name}</span>
           <ChevronDown className="ml-1.5 h-3.5 w-3.5 text-stone-400" />
         </button>
       </div>
 
       {isOpen && (
-        <div className="origin-top-right absolute right-0 mt-2 w-40 rounded-xl shadow-2xl bg-[#20140e] border border-[#4a3022] divide-y divide-[#332117] focus:outline-none overflow-hidden animate-fadeIn">
+        <div className="origin-top-right absolute right-0 mt-2 w-40 rounded-xl shadow-2xl bg-[#20140e] border border-[#4a3022] divide-y divide-[#332117] focus:outline-none overflow-hidden animate-fadeIn z-50">
           <div className="py-1" role="menu">
             {languages.map((lang) => (
               <button
                 key={lang.code}
                 className={`group flex items-center px-3 py-2 text-xs w-full transition-colors ${
-                  locale === lang.code
+                  activeLocale === lang.code
                     ? 'bg-amber-600/30 text-amber-300 font-bold'
                     : 'text-stone-300 hover:bg-white/10 hover:text-white'
                 }`}

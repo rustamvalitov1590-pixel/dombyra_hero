@@ -1,12 +1,17 @@
-import {getRequestConfig} from 'next-intl/server';
-import {cookies} from 'next/headers'; // Import necessary function to read cookies
+import { getRequestConfig } from 'next-intl/server';
+import { cookies } from 'next/headers';
 
 export default getRequestConfig(async () => {
-  const localeCookie = cookies().get('locale'); // Read the locale from cookies
-  const locale = localeCookie ? localeCookie.value : 'kk'; // Fallback to 'en' if no cookie is found
+  const cookieStore = cookies();
+  const localeCookie = cookieStore.get('locale');
+  const validLocales = ['ru', 'kk'];
+  const locale = (localeCookie && validLocales.includes(localeCookie.value))
+    ? localeCookie.value
+    : 'ru';
 
   return {
     locale,
-    messages: (await import(`../messages/${locale}.json`)).default
+    messages: (await import(`../messages/${locale}.json`)).default,
   };
 });
+

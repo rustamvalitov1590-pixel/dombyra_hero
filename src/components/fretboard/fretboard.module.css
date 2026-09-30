@@ -1,78 +1,93 @@
-
+.fretboardWrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding: 8px 0;
+  scrollbar-width: thin;
+}
 
 .fretboard {
-    display: flex;
-    flex-direction: column;
-    background-color: #be975b;
-    width: 100%;
-    height: 150px;
-    margin-top: 50px;
-    border: rgb(48, 33, 5) 4px solid;
-  }
-  
-  .string {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    position: relative;
-  }
-  
-  .string::before {
-    content: '';
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(#eee, #999);
-    box-shadow: 76px 3px 10px #806233;
-    z-index: 1;
-    position: absolute;
-    top: 32px;
-  }
-  
-  .noteFret {
-    display: flex;
-    flex: 1;
-    border-right: 5px solid;
-    border-image: linear-gradient(to left, #777, #bbb, #777) 1 100%;
-    justify-content: center;
-    align-items: center;
-    background-image: url();
-  }
-  
-  .noteFret:last-child {
-    background-color: rgb(48, 33, 5);
-    min-width: 76px;
-    flex-grow: 0;
-    flex-shrink: 0;
-  }
-  
-  .noteFret:first-child {
-    background-color: rgb(48, 33, 5);
-    min-width: 50px;
-    flex-grow: 0;
-    flex-shrink: 0;
-  }
-  
-  .noteFret::before {
-    content: attr(data-note);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    line-height: 30px;
-    text-align: center;
-    background: teal;
-    z-index: 2;
-    color: #eee;
-    opacity: var(--noteDotOpacity);
-    
-  }
-  
-  .fretmark::after {
-    content: '';
-    position: absolute;
-    height: 15px;
-    width: 15px;
-    border-radius: 50%;
-    background: rgb(48, 33, 5);
-    top: 62px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #2B1B12 0%, #382417 50%, #22140D 100%);
+  width: 100%;
+  min-width: 720px;
+  height: 140px;
+  border-radius: 16px;
+  border: 3px solid #6B4423;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 8px 24px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.string {
+  width: 100%;
+  height: 50%;
+  display: flex;
+  position: relative;
+}
+
+.string::before {
+  content: '';
+  width: 100%;
+  height: 2.5px;
+  background: linear-gradient(90deg, #FDE68A, #F59E0B, #FDE68A);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  z-index: 1;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.noteFret {
+  display: flex;
+  flex: 1;
+  border-right: 3px solid #8C5E1E;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.noteFret:last-child {
+  background-color: #170E08;
+  min-width: 60px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.noteFret:first-child {
+  background-color: #170E08;
+  min-width: 44px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.noteFret::before {
+  content: attr(data-note);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  background: radial-gradient(circle, #FFE79A 0%, #D4AF37 60%, #996515 100%);
+  box-shadow: 0 0 14px rgba(212, 175, 55, 0.95);
+  z-index: 10;
+  color: #1A0F07;
+  opacity: var(--noteDotOpacity, 0);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  transform: scale(calc(var(--noteDotOpacity, 0)));
+}
+
+.fretmark::after {
+  content: '';
+  position: absolute;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background: #D4AF37;
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.7);
+  bottom: -5px;
+  z-index: 2;
+}

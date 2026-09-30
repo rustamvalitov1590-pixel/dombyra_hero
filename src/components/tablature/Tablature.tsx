@@ -25,17 +25,24 @@ export const Tablature: React.FC<TablatureProps> = ({
 }) => {
   const t = useTranslations('tablature');
   const activeCardRef = useRef<HTMLDivElement | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto-scroll active card into view when playing
+  // Auto-scroll active card smoothly into the center of the tablature row
   useEffect(() => {
-    if (activeCardRef.current) {
-      activeCardRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center',
+    const container = scrollContainerRef.current;
+    const card = activeCardRef.current;
+    if (container && card) {
+      const cardRect = card.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const offset = cardRect.left - containerRect.left;
+      const targetScroll = container.scrollLeft + offset - container.clientWidth / 2 + card.clientWidth / 2;
+
+      container.scrollTo({
+        left: Math.max(0, targetScroll),
+        behavior: isPlaying ? 'smooth' : 'auto',
       });
     }
-  }, [currentSectionIndex, currentStepIndex]);
+  }, [currentSectionIndex, currentStepIndex, isPlaying]);
 
   const isDark = theme === 'dark';
 
@@ -61,7 +68,7 @@ export const Tablature: React.FC<TablatureProps> = ({
       </div>
 
       {/* Sections list */}
-      <div className="flex flex-col gap-8 overflow-x-auto pb-4 scrollbar-hide">
+      <div ref={scrollContainerRef} className="flex flex-col gap-8 overflow-x-auto pb-4 scrollbar-hide scroll-smooth">
         {song.sections.map((section, secIdx) => {
           const isCurrentSection = secIdx === currentSectionIndex;
 

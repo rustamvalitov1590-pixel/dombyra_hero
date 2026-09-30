@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { MessageSquare, X, Send, Sparkles, Volume2, VolumeX, HelpCircle, Box } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import NuraliAvatar from './NuraliAvatar';
@@ -25,6 +25,7 @@ interface ChatMessage {
 export default function NuraliMascot() {
   const pathname = usePathname();
   const t = useTranslations('nurali');
+  const locale = useLocale();
 
   // 3D Parallax Tilt & Pupil tracking states
   const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
@@ -171,6 +172,7 @@ export default function NuraliMascot() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          locale,
           messages: newMessages.map((m) => ({
             role: m.role === 'assistant' ? 'model' : 'user',
             content: m.content,

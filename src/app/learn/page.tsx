@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { SONGS, Song, SongStep, SongSection } from '@/data/songs';
+import { SONGS, Song, SongStep, SongSection, getFretNoteName } from '@/data/songs';
 import Tablature from '@/components/tablature/Tablature';
 import InteractiveNeck from '@/components/fretboard/InteractiveNeck';
 import dombyraAudio from '@/utils/dombyraAudio';
@@ -17,6 +17,8 @@ export default function LearnPage() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playSpeed, setPlaySpeed] = useState<number>(0.6); // Default comfortable learning speed
   const [loopSection, setLoopSection] = useState<boolean>(false);
+
+  const practiceAreaRef = useRef<HTMLDivElement | null>(null);
 
   const song: Song = SONGS[selectedSongIndex] || SONGS[0];
   const currentSection: SongSection = song.sections[currentSectionIndex] || song.sections[0];
@@ -77,7 +79,7 @@ export default function LearnPage() {
         const tag = (document.activeElement?.tagName || '').toLowerCase();
         if (tag !== 'input' && tag !== 'textarea' && tag !== 'select') {
           e.preventDefault();
-          setIsPlaying((prev) => !prev);
+          handleTogglePlay();
         }
       }
     };
@@ -86,7 +88,13 @@ export default function LearnPage() {
   }, []);
 
   const handleTogglePlay = () => {
-    setIsPlaying((prev) => !prev);
+    setIsPlaying((prev) => {
+      const next = !prev;
+      if (next && practiceAreaRef.current) {
+        practiceAreaRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      return next;
+    });
   };
 
   const handleReset = () => {
@@ -112,45 +120,49 @@ export default function LearnPage() {
     setCurrentStepIndex(0);
   };
 
+  const tuningType = (song.tuning_key === 'teris' ? 'teris' : 'standard') as 'standard' | 'teris';
+
   return (
-    <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] px-3 sm:px-6 py-4 pb-60 sm:pb-52 flex flex-col items-center">
+    <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] px-3 sm:px-6 py-4 pb-48 sm:pb-44 flex flex-col items-center">
       {/* Page Title & Mode Navigation */}
       <div className="w-full max-w-4xl flex flex-col gap-4 mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shrink-0 mt-0.5 sm:mt-0">
               <BookOpen size={18} />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
-                {t('title')}
-                <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-black tracking-tight">
+                  {t('title')}
+                </h1>
+                <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 whitespace-nowrap inline-block">
                   {t('badge')}
                 </span>
-              </h1>
-              <p className="text-xs text-[#E8DBCF]/70">
+              </div>
+              <p className="text-xs text-[#E8DBCF]/70 mt-0.5">
                 {t('subtitle')}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
             <Link
               href="/tuner"
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors whitespace-nowrap"
             >
               {t('btn_tuner')}
             </Link>
             <Link
               href="/karaoke"
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors whitespace-nowrap"
             >
               {t('btn_karaoke')}
             </Link>
           </div>
         </div>
 
-        {/* Kui Library Selector (Dropdown List matching game.html / Screenshot 2) */}
+        {/* Kui Library Selector */}
         <div className="w-full bg-[#1B1109]/95 border-2 border-[#8C5E1E]/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.7)] backdrop-blur-md flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
             <div>
@@ -185,7 +197,7 @@ export default function LearnPage() {
             </div>
           </div>
 
-          {/* Styled Select Dropdown matching screenshot 2 */}
+          {/* Styled Select Dropdown */}
           <div className="relative">
             <select
               value={selectedSongIndex}
@@ -206,101 +218,141 @@ export default function LearnPage() {
           </div>
         </div>
 
-        {/* Fixed Floating Playback Controls Pinned Above Bottom Navigation Bar */}
-        <div className="fixed bottom-20 sm:bottom-20 md:bottom-20 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-3xl z-40 bg-[#1B1109]/95 backdrop-blur-md border-2 border-[#8C6239]/80 rounded-2xl p-2 sm:p-2.5 shadow-[0_12px_36px_rgba(0,0,0,0.95),0_2px_8px_rgba(140,98,57,0.35)] flex flex-col md:flex-row items-center justify-between gap-2.5 transition-all">
-          {/* Main Action Buttons & Counter */}
-          <div className="flex items-center justify-between md:justify-start gap-2 sm:gap-3 w-full md:w-auto flex-shrink-0">
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-              <button
-                onClick={handleTogglePlay}
-                className="whitespace-nowrap px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#996515] text-[#1A0F07] font-black text-xs sm:text-sm shadow-[0_4px_14px_rgba(184,134,11,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0"
-              >
-                {isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5 fill-current" />}
-                <span>{isPlaying ? t('stop') : t('play')}</span>
-              </button>
-
-              <button
-                onClick={handleReset}
-                title={t('restart')}
-                className="whitespace-nowrap px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-[#2E1A0F] hover:bg-[#3D2314] text-[#E2C499] hover:text-[#FFF8E7] border border-[#6B4423]/60 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0"
-              >
-                <RotateCcw size={14} />
-                <span className="hidden sm:inline">{t('restart')}</span>
-              </button>
-
-              <button
-                onClick={() => setLoopSection((prev) => !prev)}
-                title={t('repeat_tooltip')}
-                className={`whitespace-nowrap px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl border font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer flex-shrink-0 ${
-                  loopSection
-                    ? 'bg-[#6B4223] text-[#FFF8E7] border-[#D4AF37] shadow-sm'
-                    : 'bg-[#2E1A0F] hover:bg-[#3D2314] text-[#E2C499] hover:text-[#FFF8E7] border-[#6B4423]/60'
-                }`}
-              >
-                <Repeat size={14} />
-                <span className="hidden sm:inline">{t('repeat')}</span>
-              </button>
+        {/* Practice Area: Live HUD + Synchronized Dombyra Neck + Tablature */}
+        <div ref={practiceAreaRef} className="w-full flex flex-col gap-3 scroll-mt-4">
+          {/* Realtime Note / Playhead HUD */}
+          <div className="w-full p-2.5 sm:p-3 rounded-2xl bg-[#1C120B]/95 border border-amber-500/40 shadow-xl flex items-center justify-between gap-2 backdrop-blur-md">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`w-2.5 h-2.5 rounded-full ${isPlaying ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
+              <span className="text-xs uppercase font-extrabold tracking-wider text-amber-300">
+                {isPlaying ? 'Сейчас играет:' : 'Выбранная нота:'}
+              </span>
+              <div className="flex items-center gap-1.5 font-mono text-xs sm:text-sm font-black text-white flex-wrap">
+                {currentStep?.bottom !== null && currentStep?.bottom !== undefined && (
+                  <span className="px-2 py-0.5 rounded-lg bg-amber-600/30 text-amber-200 border border-amber-500/40 shadow-sm">
+                    Н: {currentStep.bottom} ({getFretNoteName('bottom', currentStep.bottom, tuningType).fullName})
+                  </span>
+                )}
+                {currentStep?.top !== null && currentStep?.top !== undefined && (
+                  <span className="px-2 py-0.5 rounded-lg bg-amber-700/30 text-amber-300 border border-amber-600/40 shadow-sm">
+                    В: {currentStep.top} ({getFretNoteName('top', currentStep.top, tuningType).fullName})
+                  </span>
+                )}
+                <span className="text-amber-400 font-extrabold ml-1">
+                  {currentStep?.stroke === 'down' ? '↓' : currentStep?.stroke === 'up' ? '↑' : ''}
+                </span>
+              </div>
             </div>
 
-            {/* Center Position & Step Counter Badge: ЧАСТЬ 1 - ШАГ: 1 / 15 */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#26160C] border border-[#8C5E1E]/60 text-xs font-mono text-[#F5EBE0] font-bold whitespace-nowrap flex-shrink-0">
-              {t('part').toUpperCase()} {currentSectionIndex + 1} - {t('step')} {currentStepIndex + 1} / {currentSection.steps.length}
+            <div className="text-xs font-mono font-bold text-[#E2C499]/80 hidden sm:block">
+              {t('part')} {currentSectionIndex + 1} · {t('step')} {currentStepIndex + 1}/{currentSection.steps.length}
             </div>
           </div>
 
-          {/* Speed Presets & Tempo BPM */}
-          <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto pt-1.5 md:pt-0 border-t border-[#8C6239]/30 md:border-t-0 flex-shrink-0">
-            <div className="flex items-center justify-between flex-1 md:flex-initial gap-1 bg-[#160D07] p-1 rounded-xl border border-[#52331C]/60 flex-shrink-0">
-              {[0.4, 0.6, 0.8, 1.0].map((spd) => (
-                <button
-                  key={spd}
-                  onClick={() => setPlaySpeed(spd)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                    playSpeed === spd
-                      ? 'bg-[#B8860B]/30 text-[#FFF8E7] border border-[#D4AF37]/70 shadow-sm'
-                      : 'text-[#C89D66] hover:text-white'
-                  }`}
-                >
-                  {spd}×
-                </button>
-              ))}
+          {/* Synchronized Dombyra Neck (20 Frets) */}
+          <InteractiveNeck
+            activeBottomFret={currentStep?.bottom ?? null}
+            activeTopFret={currentStep?.top ?? null}
+            tuning={tuningType}
+            theme="dark"
+          />
+
+          {/* Tablature Component */}
+          <div className="w-full flex flex-col gap-2">
+            <div className="flex items-center justify-between px-1">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-amber-300">
+                {t('tablature_title')} {song.title}
+              </h2>
+              <span className="text-xs text-stone-400">
+                {t('part')} {currentSectionIndex + 1} {t('of')} {song.sections.length} · {t('note')} {currentStepIndex + 1} / {currentSection.steps.length}
+              </span>
             </div>
 
-            <div className="text-xs text-[#E2C499] font-mono px-2.5 py-1.5 bg-[#140904] rounded-lg border border-[#6B4423]/50 flex-shrink-0 whitespace-nowrap">
-              <span className="font-bold text-[#E2C499]">100 BPM</span>
-            </div>
+            <Tablature
+              song={song}
+              currentSectionIndex={currentSectionIndex}
+              currentStepIndex={currentStepIndex}
+              isPlaying={isPlaying}
+              onStepClick={handleStepClick}
+              theme="dark"
+            />
           </div>
         </div>
 
-        {/* Synchronized Dombyra Neck (20 Frets) */}
-        <InteractiveNeck
-          activeBottomFret={currentStep?.bottom ?? null}
-          activeTopFret={currentStep?.top ?? null}
-          tuning={song.tuning_key === 'teris' ? 'teris' : 'standard'}
-          theme="dark"
-        />
+        {/* Floating Playback Controls Pinned Above Bottom Navigation Bar */}
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-4xl z-40 bg-[#1B1109]/95 backdrop-blur-md border-2 border-[#8C6239]/80 rounded-2xl p-2 sm:p-2.5 sm:px-4 shadow-[0_12px_36px_rgba(0,0,0,0.95),0_2px_8px_rgba(140,98,57,0.35)] transition-all">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-2.5 w-full">
+            {/* Left Group: Play/Stop, Restart, Loop */}
+            <div className="flex items-center justify-between w-full md:w-auto gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button
+                  onClick={handleTogglePlay}
+                  className="whitespace-nowrap px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-[#B8860B] via-[#D4AF37] to-[#996515] text-[#1A0F07] font-black text-xs sm:text-sm shadow-[0_4px_14px_rgba(184,134,11,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  {isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5 fill-current" />}
+                  <span>{isPlaying ? t('stop') : t('play')}</span>
+                </button>
 
-        {/* Screenshot-matched Tablature Component */}
-        <div className="w-full flex flex-col gap-2">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-amber-300">
-              {t('tablature_title')} {song.title}
-            </h2>
-            <span className="text-xs text-stone-400">
-              {t('part')} {currentSectionIndex + 1} {t('of')} {song.sections.length} · {t('note')} {currentStepIndex + 1} / {currentSection.steps.length}
-            </span>
+                <button
+                  onClick={handleReset}
+                  title={t('restart')}
+                  className="whitespace-nowrap px-2.5 sm:px-3 py-2 rounded-xl bg-[#2E1A0F] hover:bg-[#3D2314] text-[#E2C499] hover:text-[#FFF8E7] border border-[#6B4423]/60 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  <RotateCcw size={14} />
+                  <span className="hidden sm:inline">{t('restart')}</span>
+                </button>
+
+                <button
+                  onClick={() => setLoopSection((prev) => !prev)}
+                  title={t('repeat_tooltip')}
+                  className={`whitespace-nowrap px-2.5 sm:px-3 py-2 rounded-xl border font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                    loopSection
+                      ? 'bg-[#6B4223] text-[#FFF8E7] border-[#D4AF37] shadow-sm'
+                      : 'bg-[#2E1A0F] hover:bg-[#3D2314] text-[#E2C499] hover:text-[#FFF8E7] border-[#6B4423]/60'
+                  }`}
+                >
+                  <Repeat size={14} />
+                  <span className="hidden sm:inline">{t('repeat')}</span>
+                </button>
+              </div>
+
+              {/* Mobile / Tablet compact counter in row 1 */}
+              <div className="flex md:hidden items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#26160C] border border-[#8C5E1E]/60 text-xs font-mono text-[#F5EBE0] font-bold whitespace-nowrap shrink-0">
+                {t('part')} {currentSectionIndex + 1} · {currentStepIndex + 1}/{currentSection.steps.length}
+              </div>
+            </div>
+
+            {/* Desktop Center Step Counter Badge */}
+            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#26160C] border border-[#8C5E1E]/60 text-xs font-mono text-[#F5EBE0] font-bold whitespace-nowrap shrink-0">
+              {t('part')} {currentSectionIndex + 1} · {t('step')} {currentStepIndex + 1}/{currentSection.steps.length}
+            </div>
+
+            {/* Right Group: Speed Presets & Tempo BPM */}
+            <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto pt-1.5 md:pt-0 border-t border-[#8C6239]/30 md:border-t-0 shrink-0">
+              <div className="flex items-center justify-between flex-1 md:flex-initial gap-1 bg-[#160D07] p-1 rounded-xl border border-[#52331C]/60 shrink-0">
+                {[0.4, 0.6, 0.8, 1.0].map((spd) => (
+                  <button
+                    key={spd}
+                    onClick={() => setPlaySpeed(spd)}
+                    className={`px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                      playSpeed === spd
+                        ? 'bg-[#B8860B]/30 text-[#FFF8E7] border border-[#D4AF37]/70 shadow-sm'
+                        : 'text-[#C89D66] hover:text-white'
+                    }`}
+                  >
+                    {spd}×
+                  </button>
+                ))}
+              </div>
+
+              <div className="text-xs text-[#E2C499] font-mono px-2.5 py-1.5 bg-[#140904] rounded-lg border border-[#6B4423]/50 shrink-0 whitespace-nowrap">
+                <span className="font-bold text-[#E2C499]">100 BPM</span>
+              </div>
+            </div>
           </div>
-
-          <Tablature
-            song={song}
-            currentSectionIndex={currentSectionIndex}
-            currentStepIndex={currentStepIndex}
-            isPlaying={isPlaying}
-            onStepClick={handleStepClick}
-            theme="dark"
-          />
         </div>
       </div>
     </div>
   );
 }
+

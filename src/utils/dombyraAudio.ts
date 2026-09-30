@@ -1,6 +1,7 @@
 'use client';
 
 import { getFretFrequency } from '@/data/songs';
+import { soundWave } from './soundWave';
 
 class DombyraAudioEngine {
   private ctx: AudioContext | null = null;
@@ -22,6 +23,7 @@ class DombyraAudioEngine {
   public playPluckedString(frequency: number, delayMs: number = 0, duration: number = 1.2, volume: number = 0.8) {
     if (this.isMuted) return;
     try {
+      soundWave.trigger(frequency, volume);
       const ctx = this.initContext();
       const startTime = ctx.currentTime + delayMs / 1000;
 

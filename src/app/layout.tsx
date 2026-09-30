@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "../components/header";
 import BottomNav from "../components/bottom-nav";
 import NuraliMascot from "../components/nurali/NuraliMascot";
+import AudioReactiveCanvas from "../components/canvas/AudioReactiveCanvas";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { Analytics } from "@vercel/analytics/react";
@@ -32,8 +33,11 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body className={`${inter.className} bg-[#0e0805] text-[#F4EFE6] flex justify-center min-h-screen selection:bg-amber-500 selection:text-stone-950`}>
+        {/* Audio-Reactive Gradient & Soundwave Background */}
+        <AudioReactiveCanvas />
+
         <NextIntlClientProvider messages={messages}>
-          <div className="w-full max-w-5xl bg-[#160E0A] min-h-[100dvh] shadow-2xl relative overflow-x-hidden flex flex-col pb-20 scrollbar-hide border-x border-[#2c1d14]">
+          <div className="w-full max-w-5xl bg-[#160E0A]/95 min-h-[100dvh] shadow-2xl relative overflow-x-hidden flex flex-col pb-20 scrollbar-hide border-x border-[#2c1d14]">
             {/* Top Navigation Header Bar */}
             <Header />
 

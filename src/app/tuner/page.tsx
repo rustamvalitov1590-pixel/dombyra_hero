@@ -207,21 +207,23 @@ export default function TunerPage() {
     <div className="w-full min-h-screen bg-[#160E0A] text-[#F4EFE6] px-4 sm:px-6 py-6 pb-36 sm:pb-40 flex flex-col items-center">
       <div className="w-full max-w-xl flex flex-col gap-6">
         {/* Header with Navigation */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-black tracking-tight flex items-center gap-2">
-              {t('title')}
-              <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight">
+                {t('title')}
+              </h1>
+              <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap inline-block">
                 {t('online')}
               </span>
-            </h1>
-            <p className="text-xs text-[#E8DBCF]/70">
+            </div>
+            <p className="text-xs text-[#E8DBCF]/70 mt-0.5">
               {t('subtitle')}
             </p>
           </div>
           <Link
             href="/learn"
-            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors"
+            className="self-start sm:self-auto px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#2a1d17] hover:bg-[#38261e] border border-amber-900/40 text-amber-200 transition-colors whitespace-nowrap"
           >
             {t('btn_trainer')}
           </Link>
