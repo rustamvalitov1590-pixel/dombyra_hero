@@ -33,6 +33,11 @@ export async function POST(req: Request) {
   let locale = 'ru';
   let lastUserMsg = '';
   try {
+    const apiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+      process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+
     const body = await req.json().catch(() => ({}));
     const rawMessages = Array.isArray(body.messages)
       ? body.messages
@@ -45,7 +50,8 @@ export async function POST(req: Request) {
     lastUserMsg = rawMessages.length > 0 ? (rawMessages[rawMessages.length - 1]?.content || '') : '';
 
     // If no API key configured on the server, return smart domain-specific response
-    if (!GEMINI_API_KEY) {
+    if (!apiKey) {
+      console.warn('GEMINI_API_KEY is not configured in environment variables.');
       return NextResponse.json({ text: getSmartFallback(lastUserMsg, isKazakh) });
     }
 
@@ -60,20 +66,20 @@ export async function POST(req: Request) {
     }
 
     const systemPrompt = isKazakh
-      ? 'Сен — Нұрәлісің, домбыра және қазақ ұлттық музыкасының білгірі, мейірімді әрі шабыттандырушы ИИ-ұстазсың. Домбыра пернелері, қағыстары (қағыс түрлері: дара, қос, ілме, шерту), Курманғазы, Дина Нұрпейісова және күйлер туралы білесің. Қазақ тілінде қысқа, нақты, рух беретін сөздермен жауап бер.'
-      : 'Ты — Нурали, дружелюбный и вдохновляющий ИИ-учитель казахской национальной музыки и домбры. Ты эксперт по строю домбры (Оң бұрау, Теріс бұрау), ладам, ударам (қағыс: дара, қос, ілме), кюям Курмангазы, Таттимбета, Дины Нурпеисовой. Отвечай дружелюбно, ёмко, используй эмодзи и музыкальные термины. Если вопрос не о музыке, тепло возвращай тему к домбре.';
+      ? 'Сен — Нұрәлісің, домбыра және қазақ ұлттық музыкасының білгірі, мейірімді әрі шабыттандырушы ИИ-ұстазсың. Домбыра пернелері, қағыстары (қағыс түрлері: дара, қос, ілме, шерту), Курманғазы, Дина Нұрпейісова және күйлер туралы білесің. Қазақ тілінде жылы, қызықты, эмодзилермен жауап бер. Егер сұрақ музыка туралы болмаса (мысалы, ауа-райы), әзілмен домбыра тақырыбына бұр!'
+      : 'Ты — Нурали, дружелюбный и вдохновляющий ИИ-учитель казахской национальной музыки и домбры. Ты эксперт по строю домбры (Оң бұрау, Теріс бұрау), ладам, ударам (қағыс: дара, қос, ілме), кюям Курмангазы, Таттимбета, Дины Нурпеисовой. Отвечай дружелюбно, живо, с юмором, используй эмодзи и музыкальные термины. Если вопрос не о музыке (например, про погоду), тепло отвечай и с улыбкой переводи тему к домбре!';
 
     const systemInstruction = {
       parts: [{ text: systemPrompt }],
     };
 
-    // Candidate models to try in order of preference (fast, stable, and tested)
+    // Candidate models to try in order of preference (gemini-3.5-flash is ultra-fast & highly available)
     const candidateModels = [
-      'gemini-flash-latest',
-      'gemini-3.8-flash',
-      'gemini-2.5-flash',
       'gemini-3.5-flash',
       'gemini-flash-lite-latest',
+      'gemini-flash-latest',
+      'gemini-3.5-flash-lite',
+      'gemini-3.8-flash',
     ];
     let lastError: any = null;
     let aiResponse: string | null = null;
@@ -86,7 +92,7 @@ export async function POST(req: Request) {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'X-goog-api-key': GEMINI_API_KEY,
+              'X-goog-api-key': apiKey,
             },
             signal: AbortSignal.timeout(8000),
             body: JSON.stringify({
