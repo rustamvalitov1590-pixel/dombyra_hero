@@ -112,22 +112,21 @@ export default function NuraliMascot() {
     return () => clearTimeout(blinkTimer);
   }, []);
 
-  // Text-To-Speech (SpeechSynthesis) function
-  const speakText = (text: string) => {
-    if (!isVoiceEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    try {
+  // Cancel and silence robotic SpeechSynthesis
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
+
+  const speakText = (_text: string) => {
+    // Disabled robotic legacy browser synthesizer
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      const clean = text.replace(/[*_#`]/g, '');
-      const utterance = new SpeechSynthesisUtterance(clean);
-      const voices = window.speechSynthesis.getVoices();
-      const kkVoice = voices.find((v) => v.lang.toLowerCase().includes('kk'));
-      const ruVoice = voices.find((v) => v.lang.toLowerCase().includes('ru'));
-      if (kkVoice) utterance.voice = kkVoice;
-      else if (ruVoice) utterance.voice = ruVoice;
-      utterance.rate = 1.05;
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.warn('Speech synthesis error:', e);
     }
   };
 
@@ -198,7 +197,6 @@ export default function NuraliMascot() {
       const answer = data.text || t('err_conn');
 
       setMessages((prev) => [...prev, { role: 'assistant', content: answer }]);
-      speakText(answer);
     } catch (err) {
       console.error('Chat error:', err);
       const fallback = t('err_conn');
