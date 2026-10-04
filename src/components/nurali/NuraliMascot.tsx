@@ -34,7 +34,12 @@ export default function NuraliMascot() {
   const [isHovered, setIsHovered] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
   const [isCheering, setIsCheering] = useState(false);
-  const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [playingMsgIndex, setPlayingMsgIndex] = useState<number | null>(null);
+
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const audioCacheRef = useRef<Map<string, string>>(new Map());
 
   // Bubble states
   const [bubbleText, setBubbleText] = useState('');
@@ -112,23 +117,92 @@ export default function NuraliMascot() {
     return () => clearTimeout(blinkTimer);
   }, []);
 
-  // Cancel and silence robotic SpeechSynthesis
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  // Stop active audio playback
+  const stopAudio = () => {
+    if (currentAudioRef.current) {
       try {
-        window.speechSynthesis.cancel();
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
       } catch (e) {
         // ignore
       }
+      currentAudioRef.current = null;
     }
-  }, []);
+    setIsPlayingAudio(false);
+    setPlayingMsgIndex(null);
+    setIsTalking(false);
+  };
 
-  const speakText = (_text: string) => {
-    // Disabled robotic legacy browser synthesizer
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+  // Play voice using ElevenLabs or TTS backend
+  const playVoice = async (text: string, msgIndex?: number) => {
+    if (!text || typeof window === 'undefined') return;
+    stopAudio();
+
+    try {
+      setIsPlayingAudio(true);
+      if (typeof msgIndex === 'number') setPlayingMsgIndex(msgIndex);
+
+      let blobUrl = audioCacheRef.current.get(text);
+      if (!blobUrl) {
+        const res = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, locale }),
+        });
+
+        if (!res.ok) {
+          setIsPlayingAudio(false);
+          setPlayingMsgIndex(null);
+          return;
+        }
+
+        const blob = await res.blob();
+        blobUrl = URL.createObjectURL(blob);
+        audioCacheRef.current.set(text, blobUrl);
+      }
+
+      const audio = new Audio(blobUrl);
+      currentAudioRef.current = audio;
+
+      audio.onplay = () => {
+        setIsTalking(true);
+      };
+
+      audio.onended = () => {
+        setIsTalking(false);
+        setIsPlayingAudio(false);
+        setPlayingMsgIndex(null);
+        currentAudioRef.current = null;
+      };
+
+      audio.onerror = () => {
+        setIsTalking(false);
+        setIsPlayingAudio(false);
+        setPlayingMsgIndex(null);
+        currentAudioRef.current = null;
+      };
+
+      await audio.play();
+    } catch (err) {
+      console.warn('Voice playback failed:', err);
+      setIsTalking(false);
+      setIsPlayingAudio(false);
+      setPlayingMsgIndex(null);
     }
   };
+
+  // Stop audio on modal close or unmount
+  useEffect(() => {
+    if (!isChatOpen) {
+      stopAudio();
+    }
+  }, [isChatOpen]);
+
+  useEffect(() => {
+    return () => {
+      stopAudio();
+    };
+  }, []);
 
   // Contextual tips depending on active page
   useEffect(() => {
@@ -196,7 +270,15 @@ export default function NuraliMascot() {
       const data = await response.json();
       const answer = data.text || t('err_conn');
 
-      setMessages((prev) => [...prev, { role: 'assistant', content: answer }]);
+      setMessages((prev) => {
+        const next = [...prev, { role: 'assistant' as const, content: answer }];
+        if (isVoiceEnabled) {
+          setTimeout(() => {
+            playVoice(answer, next.length - 1);
+          }, 150);
+        }
+        return next;
+      });
     } catch (err) {
       console.error('Chat error:', err);
       const fallback = t('err_conn');
@@ -209,7 +291,9 @@ export default function NuraliMascot() {
       ]);
     } finally {
       setIsLoading(false);
-      setIsTalking(false);
+      if (!isVoiceEnabled) {
+        setIsTalking(false);
+      }
     }
   };
 
@@ -397,6 +481,24 @@ export default function NuraliMascot() {
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Voice narration toggle */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isPlayingAudio) stopAudio();
+                    setIsVoiceEnabled((prev) => !prev);
+                  }}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all border ${
+                    isVoiceEnabled
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]'
+                      : 'bg-stone-800/80 text-stone-500 border-stone-700 hover:text-stone-300'
+                  }`}
+                  title={isVoiceEnabled ? t('voice_off') : t('voice_on')}
+                  aria-label={isVoiceEnabled ? t('voice_off') : t('voice_on')}
+                >
+                  {isVoiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                </button>
+
                 {/* Close modal */}
                 <button
                   onClick={() => setIsChatOpen(false)}
@@ -416,18 +518,45 @@ export default function NuraliMascot() {
                   className={`flex items-end gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {m.role === 'assistant' && (
-                    <div className="w-7 h-7 rounded-full bg-[#120904] border border-[#D4AF37]/60 overflow-hidden shrink-0 shadow-sm">
-                      <NuraliAvatar />
+                    <div className="w-7 h-7 rounded-full bg-[#120904] border border-[#D4AF37]/60 overflow-hidden shrink-0 shadow-sm mb-1">
+                      <NuraliAvatar isTalking={isTalking && playingMsgIndex === idx} />
                     </div>
                   )}
-                  <div
-                    className={`max-w-[85%] p-3.5 rounded-2xl leading-relaxed whitespace-pre-wrap ${
-                      m.role === 'user'
-                        ? 'bg-gradient-to-tr from-amber-600 to-amber-700 text-white rounded-br-none shadow-md font-medium'
-                        : 'bg-[#24160E] border border-amber-900/30 text-[#FFF8E7] rounded-bl-none shadow'
-                    }`}
-                  >
-                    {m.content}
+                  <div className="flex flex-col max-w-[85%]">
+                    <div
+                      className={`p-3.5 rounded-2xl leading-relaxed whitespace-pre-wrap ${
+                        m.role === 'user'
+                          ? 'bg-gradient-to-tr from-amber-600 to-amber-700 text-white rounded-br-none shadow-md font-medium'
+                          : 'bg-[#24160E] border border-amber-900/30 text-[#FFF8E7] rounded-bl-none shadow'
+                      }`}
+                    >
+                      {m.content}
+                    </div>
+
+                    {m.role === 'assistant' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (playingMsgIndex === idx && isPlayingAudio) {
+                            stopAudio();
+                          } else {
+                            playVoice(m.content, idx);
+                          }
+                        }}
+                        className={`mt-1.5 self-start flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full border transition-all ${
+                          playingMsgIndex === idx && isPlayingAudio
+                            ? 'bg-amber-500/30 text-amber-300 border-amber-400/50 shadow-sm font-semibold'
+                            : 'bg-[#1D1109] text-stone-400 border-amber-900/40 hover:text-amber-200 hover:border-amber-700/50'
+                        }`}
+                        title={playingMsgIndex === idx && isPlayingAudio ? t('stop_voice') : t('play_voice')}
+                      >
+                        <Volume2
+                          size={12}
+                          className={playingMsgIndex === idx && isPlayingAudio ? 'animate-pulse text-amber-300' : ''}
+                        />
+                        <span>{playingMsgIndex === idx && isPlayingAudio ? t('stop_voice') : t('play_voice')}</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
