@@ -2270,23 +2270,19 @@ async function fetchChatResponse() {
   container.appendChild(div);
   container.scrollTop=container.scrollHeight;
 
-  const API_KEY = 'AQ.Ab8RN6JHA5gHb3iKyzpFECunq7axYK1KeebMzyac9UZzu4NvvA';
+  const currentLocale = (typeof currentLang !== 'undefined' && currentLang === 'kz') ? 'kk' : 'ru';
   const formattedMessages = chatHistory.map(m => ({
-    role: m.role === 'user' ? 'user' : 'model',
-    parts: [{ text: m.content }]
+    role: m.role === 'model' || m.role === 'assistant' ? 'assistant' : 'user',
+    content: m.content
   }));
 
-  const systemInstruction = {
-    parts: [{ text: "Ты — Нурали, дружелюбный ИИ-учитель казахской музыки. Ты эксперт по игре на домбре, знаешь всё о кюях, Курмангазы и Дине Нурпеисовой. Отвечай весело, используй музыкальные термины. Если спрашивают не про музыку, мягко возвращай тему к домбре. Ты общаешься с детьми-учениками. Соблюдай строгую цензуру, избегай любых взрослых, опасных или нецензурных тем. Если дети начинают баловаться, ругаться или задавать неуместные вопросы, строго, но вежливо предупреди их, что всё, что они говорят, записывается и может быть передано их родителям и учителям." }]
-  };
-
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${API_KEY}`, {
+    const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: formattedMessages,
-        system_instruction: systemInstruction
+        locale: currentLocale,
+        messages: formattedMessages
       })
     });
     
@@ -2294,18 +2290,12 @@ async function fetchChatResponse() {
     
     if (res.ok) {
       const data = await res.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Произошла ошибка при получении ответа.";
+      const text = data.text || "Произошла ошибка при получении ответа.";
       chatHistory.push({ role: 'model', content: text });
       addMessage(text, true);
-      // speakText(text); // Voice temporarily disabled
     } else {
-      const errorData = await res.text();
-      console.error("API Error:", errorData);
-      if (res.status === 503) {
-        addMessage("Қазір домбыра үйренушілер өте көп, жүйе бос емес. Бірнеше секунд күтіп, қайта сұраңызшы!", true);
-      } else {
-        addMessage("Кешіріңіз, техникалық кідіріс орын алды. Сәлден соң қайталап көріңіз!", true);
-      }
+      console.error("API Error status:", res.status);
+      addMessage("Кешіріңіз, техникалық кідіріс орын алды. Сәлден соң қайталап көріңіз!", true);
     }
   } catch (err) {
     document.getElementById('loading-bubble')?.remove();
