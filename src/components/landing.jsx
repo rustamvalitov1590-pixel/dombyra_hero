@@ -70,14 +70,6 @@ export default function Landing() {
                   <span>{t('open_tuner')}</span>
                 </Link>
               </div>
-
-              <a
-                href="/guide.html"
-                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/20 to-amber-500/10 hover:from-amber-500/25 hover:to-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all transform hover:scale-[1.01]"
-              >
-                <PlayCircle size={16} className="text-amber-400 animate-pulse" />
-                <span>🎬 Интерактивная видеоинструкция для защиты</span>
-              </a>
             </div>
 
             {/* Quick Micro Badges */}

@@ -56,6 +56,18 @@ export default function NuraliMascot() {
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const bubbleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Prevent background scrolling when chat modal is open
+  useEffect(() => {
+    if (isChatOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isChatOpen]);
+
   // 3D Tilt & Eye tracking based on mouse cursor
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -361,12 +373,12 @@ export default function NuraliMascot() {
 
       {/* Full AI Chat Modal */}
       {isChatOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-lg h-[560px] max-h-[90vh] rounded-3xl bg-[#1A1009] border-2 border-[#D4AF37] shadow-[0_24px_60px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 pb-20 sm:pb-6 bg-black/85 backdrop-blur-md animate-fadeIn">
+          <div className="w-full max-w-lg h-[580px] max-h-[82dvh] sm:max-h-[88dvh] rounded-3xl bg-[#160E08] border-2 border-amber-500/40 shadow-[0_24px_70px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="px-4 py-3 bg-[#24170E] border-b border-amber-500/30 flex items-center justify-between">
+            <div className="px-4 py-3 bg-[#1F130B] border-b border-amber-500/20 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-tr from-amber-600 to-emerald-600 p-0.5 shadow-lg shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-amber-700 p-0.5 shadow-md shrink-0 ring-1 ring-amber-400/40">
                   <div className="w-full h-full rounded-full bg-[#120904] overflow-hidden flex items-center justify-center">
                     <NuraliAvatar isTalking={isTalking} />
                   </div>
@@ -376,55 +388,21 @@ export default function NuraliMascot() {
                     <h3 className="font-bold text-sm text-white">
                       {t('title')}
                     </h3>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/40">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30">
                       {t('mentor_badge')}
                     </span>
                   </div>
-                  <p className="text-[11px] text-amber-200/70">
+                  <p className="text-[11px] text-stone-400">
                     {t('subtitle')}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                {/* 3D Model toggle button */}
-                <button
-                  onClick={() => setShow3DModel(!show3DModel)}
-                  className={`px-2.5 py-1.5 rounded-xl border transition-colors flex items-center gap-1.5 text-xs font-bold ${
-                    show3DModel
-                      ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300'
-                      : 'bg-amber-500/10 border-amber-500/40 text-amber-300 hover:bg-amber-500/20'
-                  }`}
-                  title={show3DModel ? 'Чатқа оралу' : 'Нұрәліні қарау'}
-                >
-                  <Box size={14} />
-                  <span>{show3DModel ? 'Чат' : 'Нұрәлі 2.5D'}</span>
-                </button>
-
-                {/* Voice toggle button */}
-                <button
-                  onClick={() => {
-                    const next = !isVoiceEnabled;
-                    setIsVoiceEnabled(next);
-                    if (next) speakText('Сәлем!');
-                    else if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-                      window.speechSynthesis.cancel();
-                    }
-                  }}
-                  className={`p-2 rounded-xl border transition-colors flex items-center justify-center ${
-                    isVoiceEnabled
-                      ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-                      : 'bg-white/5 border-white/10 text-stone-400 hover:text-stone-200'
-                  }`}
-                  title={isVoiceEnabled ? 'Голос включен' : 'Включить озвучку'}
-                >
-                  {isVoiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                </button>
-
                 {/* Close modal */}
                 <button
                   onClick={() => setIsChatOpen(false)}
-                  className="w-8 h-8 rounded-full bg-stone-800/80 hover:bg-stone-700 text-stone-300 hover:text-white flex items-center justify-center transition-colors"
+                  className="w-8 h-8 rounded-full bg-stone-800/90 hover:bg-stone-700 text-stone-300 hover:text-white flex items-center justify-center transition-colors border border-white/10"
                   aria-label={t('close')}
                 >
                   <X size={18} />
@@ -432,93 +410,82 @@ export default function NuraliMascot() {
               </div>
             </div>
 
-            {show3DModel ? (
-              <div className="flex-1 relative flex flex-col items-center justify-center bg-[#0F0804] overflow-hidden">
-                <Nurali3DViewer autoRotate={true} enableControls={true} className="w-full h-full" />
-                <div className="absolute bottom-3 inset-x-4 px-3 py-1.5 rounded-xl bg-black/70 border border-amber-500/30 backdrop-blur-md text-[11px] text-amber-200 text-center pointer-events-none shadow-lg">
-                  ✦ Тышқанды қозғалтыңыз — Нұрәлі көзімен бақылайды ✦
-                </div>
-              </div>
-            ) : (
-              <>
-                {/* Chat Messages List */}
-                <div className="flex-1 p-4 overflow-y-auto space-y-3.5 text-xs">
-                  {messages.map((m, idx) => (
-                    <div
-                      key={idx}
-                      className={`flex items-end gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      {m.role === 'assistant' && (
-                        <div className="w-7 h-7 rounded-full bg-[#120904] border border-[#D4AF37]/60 overflow-hidden shrink-0 shadow-sm">
-                          <NuraliAvatar />
-                        </div>
-                      )}
-                      <div
-                        className={`max-w-[85%] p-3.5 rounded-2xl leading-relaxed whitespace-pre-wrap ${
-                          m.role === 'user'
-                            ? 'bg-gradient-to-tr from-amber-600 to-amber-700 text-white rounded-br-none shadow-md'
-                            : 'bg-[#281A12] border border-[#482E1E] text-[#FFF8E7] rounded-bl-none shadow'
-                        }`}
-                      >
-                        {m.content}
-                      </div>
-                    </div>
-                  ))}
-
-                  {isLoading && (
-                    <div className="flex items-end gap-2.5 justify-start">
-                      <div className="w-7 h-7 rounded-full bg-[#120904] border border-[#D4AF37]/60 overflow-hidden shrink-0 shadow-sm animate-pulse">
-                        <NuraliAvatar isTalking={true} />
-                      </div>
-                      <div className="p-3 rounded-2xl bg-[#281A12] border border-[#482E1E] text-amber-300 flex items-center gap-2">
-                        <Sparkles size={14} className="animate-spin" />
-                        <span className="text-xs">{t('thinking')}</span>
-                      </div>
+            {/* Chat Messages List */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-3.5 text-xs sm:text-sm">
+              {messages.map((m, idx) => (
+                <div
+                  key={idx}
+                  className={`flex items-end gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  {m.role === 'assistant' && (
+                    <div className="w-7 h-7 rounded-full bg-[#120904] border border-[#D4AF37]/60 overflow-hidden shrink-0 shadow-sm">
+                      <NuraliAvatar />
                     </div>
                   )}
-                  <div ref={chatBottomRef} />
-                </div>
-
-                {/* Quick Suggestion Chips */}
-                <div className="px-3 py-2 bg-[#140C07] border-t border-white/5 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-                  {quickChips.map((chip, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleSendMessage(chip)}
-                      disabled={isLoading}
-                      className="px-2.5 py-1 rounded-lg bg-[#26170E] hover:bg-amber-600/30 border border-amber-500/20 text-[11px] text-stone-300 hover:text-amber-200 whitespace-nowrap transition-colors"
-                    >
-                      {chip}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Input Form */}
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }}
-                  className="p-3 bg-[#1A1009] border-t border-amber-500/30 flex items-center gap-2"
-                >
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder={t('ask_placeholder')}
-                    className="flex-1 h-10 px-3.5 bg-[#25170E] border border-[#482E1E] rounded-xl text-xs text-[#FFF8E7] placeholder:text-stone-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
-                  />
-                  <button
-                    type="submit"
-                    disabled={isLoading || !inputMessage.trim()}
-                    className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-bold flex items-center justify-center transition-all disabled:opacity-40 shadow"
-                    aria-label="Send message"
+                  <div
+                    className={`max-w-[85%] p-3.5 rounded-2xl leading-relaxed whitespace-pre-wrap ${
+                      m.role === 'user'
+                        ? 'bg-gradient-to-tr from-amber-600 to-amber-700 text-white rounded-br-none shadow-md font-medium'
+                        : 'bg-[#24160E] border border-amber-900/30 text-[#FFF8E7] rounded-bl-none shadow'
+                    }`}
                   >
-                    <Send size={16} />
-                  </button>
-                </form>
-              </>
-            )}
+                    {m.content}
+                  </div>
+                </div>
+              ))}
+
+              {isLoading && (
+                <div className="flex items-end gap-2.5 justify-start">
+                  <div className="w-7 h-7 rounded-full bg-[#120904] border border-[#D4AF37]/60 overflow-hidden shrink-0 shadow-sm animate-pulse">
+                    <NuraliAvatar isTalking={true} />
+                  </div>
+                  <div className="p-3 rounded-2xl bg-[#24160E] border border-amber-900/30 text-amber-300 flex items-center gap-2">
+                    <Sparkles size={14} className="animate-spin text-amber-400" />
+                    <span className="text-xs">{t('thinking')}</span>
+                  </div>
+                </div>
+              )}
+              <div ref={chatBottomRef} />
+            </div>
+
+            {/* Quick Suggestion Chips */}
+            <div className="px-3 py-2 bg-[#120A05] border-t border-white/5 flex items-center gap-2 overflow-x-auto scrollbar-hide shrink-0">
+              {quickChips.map((chip, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSendMessage(chip)}
+                  disabled={isLoading}
+                  className="px-2.5 py-1 rounded-lg bg-[#22130A] hover:bg-amber-600/25 border border-amber-500/20 text-[11px] text-stone-300 hover:text-amber-200 whitespace-nowrap transition-colors"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+
+            {/* Input Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendMessage();
+              }}
+              className="p-3 bg-[#1A1009] border-t border-amber-500/20 flex items-center gap-2 shrink-0"
+            >
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder={t('ask_placeholder')}
+                className="flex-1 h-11 px-4 bg-[#23150D] border border-amber-900/40 rounded-xl text-xs sm:text-sm text-[#FFF8E7] placeholder:text-stone-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all shadow-inner"
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !inputMessage.trim()}
+                className="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold flex items-center justify-center transition-all disabled:opacity-30 shadow-lg active:scale-95 shrink-0"
+                aria-label="Send message"
+              >
+                <Send size={18} />
+              </button>
+            </form>
           </div>
         </div>
       )}

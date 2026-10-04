@@ -52,12 +52,6 @@ export default function Footer() {
             <Trophy size={13} />
             <span>{t('karaoke')}</span>
           </Link>
-          <Link
-            href="/about"
-            className="text-stone-300 hover:text-amber-300 transition-colors"
-          >
-            {t('about')}
-          </Link>
         </nav>
       </div>
 
