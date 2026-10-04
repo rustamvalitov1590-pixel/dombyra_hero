@@ -69,10 +69,11 @@ export async function POST(req: Request) {
 
     // Candidate models to try in order of preference (fast, stable, and tested)
     const candidateModels = [
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
-      'gemini-2.0-flash-lite',
-      'gemini-1.5-pro',
+      'gemini-flash-latest',
+      'gemini-3.8-flash',
+      'gemini-2.5-flash',
+      'gemini-3.5-flash',
+      'gemini-flash-lite-latest',
     ];
     let lastError: any = null;
     let aiResponse: string | null = null;
@@ -80,10 +81,13 @@ export async function POST(req: Request) {
     for (const model of candidateModels) {
       try {
         const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'X-goog-api-key': GEMINI_API_KEY,
+            },
             signal: AbortSignal.timeout(8000),
             body: JSON.stringify({
               contents: formattedMessages,
