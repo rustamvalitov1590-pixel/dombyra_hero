@@ -16,6 +16,49 @@ function cleanTextForSpeech(raw: string): string {
     .trim();
 }
 
+async function synthesizeWithEdge(text: string, locale: string): Promise<Buffer> {
+  const { MsEdgeTTS, OUTPUT_FORMAT, PITCH } = await import('msedge-tts');
+  const tts = new MsEdgeTTS();
+  const isKazakh = locale === 'kk';
+  // Kazakh: Daulet (male) or Russian: Dmitry (male), pitch-shifted to lively young boy
+  const voiceName = isKazakh ? 'kk-KZ-DauletNeural' : 'ru-RU-DmitryNeural';
+  await tts.setMetadata(voiceName, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
+
+  return new Promise<Buffer>((resolve, reject) => {
+    const { audioStream, metadataStream } = tts.toStream(text, {
+      pitch: PITCH.HIGH,
+    });
+
+    if (metadataStream) {
+      metadataStream.on('error', () => {
+        // Prevent unhandled error event on metadataStream
+      });
+    }
+
+    const chunks: Buffer[] = [];
+
+    audioStream.on('data', (chunk: Buffer) => {
+      chunks.push(chunk);
+    });
+
+    audioStream.on('end', () => {
+      if (chunks.length > 0) {
+        resolve(Buffer.concat(chunks));
+      } else {
+        reject(new Error('Empty audio stream returned from Edge TTS'));
+      }
+    });
+
+    audioStream.on('error', (err: any) => {
+      if (chunks.length > 1000) {
+        resolve(Buffer.concat(chunks));
+      } else {
+        reject(err);
+      }
+    });
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
@@ -27,17 +70,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
     }
 
-    // Cap at 450 characters to keep audio fast and conserve API quota
+    // Cap at 450 characters to keep audio fast and conserve bandwidth
     const truncatedText = textToSpeak.length > 450
       ? textToSpeak.slice(0, 450).replace(/[.,!?][^.,!?]*$/, '') + '.'
       : textToSpeak;
 
+    // 1. Try ElevenLabs if user configured ELEVENLABS_API_KEY
     const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY;
-    // Default boy / young energetic voice ID in ElevenLabs (e.g. Antoni / Sam or custom boy voice)
     const elevenLabsVoiceId =
       process.env.ELEVENLABS_VOICE_ID || 'ErXwobaYiN019PkySvjV';
 
-    // 1. Try ElevenLabs (Multilingual v2 with Russian & Kazakh support)
     if (elevenLabsApiKey) {
       try {
         const elevenUrl = `https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}?output_format=mp3_44100_128`;
@@ -68,16 +110,28 @@ export async function POST(req: Request) {
               'Cache-Control': 'public, max-age=86400',
             },
           });
-        } else {
-          const errorText = await elRes.text();
-          console.warn('ElevenLabs API error response:', elRes.status, errorText);
         }
       } catch (elErr) {
-        console.error('ElevenLabs request failed:', elErr);
+        console.warn('ElevenLabs TTS failed, falling back to Edge Neural TTS:', elErr);
       }
     }
 
-    // 2. Fallback: Google Cloud TTS (if configured with API key or token)
+    // 2. High-Quality Edge Neural TTS (100% Free, No API Key Required)
+    // Uses Microsoft Azure Neural voices (Daulet for Kazakh, Dmitry for Russian)
+    try {
+      const audioBuffer = await synthesizeWithEdge(truncatedText, locale);
+      return new NextResponse(audioBuffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'audio/mpeg',
+          'Cache-Control': 'public, max-age=86400',
+        },
+      });
+    } catch (edgeErr) {
+      console.warn('Edge TTS failed, checking Google Cloud TTS fallback:', edgeErr);
+    }
+
+    // 3. Optional Fallback: Google Cloud TTS (if configured)
     const googleTtsKey =
       process.env.GOOGLE_CLOUD_TTS_API_KEY ||
       process.env.GOOGLE_TTS_API_KEY ||
@@ -94,12 +148,11 @@ export async function POST(req: Request) {
             input: { text: truncatedText },
             voice: {
               languageCode: isKazakh ? 'kk-KZ' : 'ru-RU',
-              // Use pitch shifted youth/boy voice
               name: isKazakh ? 'kk-KZ-Standard-A' : 'ru-RU-Wavenet-D',
             },
             audioConfig: {
               audioEncoding: 'MP3',
-              pitch: 4.0, // Child/boy vocal range modulation
+              pitch: 4.0,
               speakingRate: 1.05,
             },
           }),
@@ -117,23 +170,15 @@ export async function POST(req: Request) {
               },
             });
           }
-        } else {
-          const gErrText = await gRes.text();
-          console.warn('Google Cloud TTS error:', gRes.status, gErrText);
         }
       } catch (gErr) {
-        console.error('Google Cloud TTS failed:', gErr);
+        console.error('Google Cloud TTS fallback failed:', gErr);
       }
     }
 
-    // 3. If neither TTS service is configured or worked
     return NextResponse.json(
-      {
-        error: 'TTS_UNAVAILABLE',
-        message:
-          'ElevenLabs API key is not configured or request failed. Set ELEVENLABS_API_KEY in .env.local or Vercel.',
-      },
-      { status: 503 }
+      { error: 'TTS_FAILED', message: 'Unable to synthesize speech' },
+      { status: 500 }
     );
   } catch (error: any) {
     console.error('TTS Route Exception:', error);

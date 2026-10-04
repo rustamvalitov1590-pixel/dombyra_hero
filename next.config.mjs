@@ -10,7 +10,10 @@ const nextConfig = {
     },
     eslint: {
         ignoreDuringBuilds: true,
-    }
+    },
+    experimental: {
+        serverComponentsExternalPackages: ['msedge-tts', 'ws'],
+    },
 };
 
 export default withNextIntl(nextConfig);
